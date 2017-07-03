@@ -9,6 +9,18 @@ using UnityEngine;
 public static class SceneObjectManager
 {
     private static Dictionary<string, GameObject> objects = new Dictionary<string, GameObject>();
+    private static string nextscene;
+    public static string NextScene
+    {
+        get
+        {
+            return nextscene;
+        }
+        set
+        {
+            nextscene = value;
+        }
+    }
     /// <summary>
     /// 호출자를 게임 매니저에 추가한다.
     /// </summary>
