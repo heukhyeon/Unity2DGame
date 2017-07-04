@@ -21,6 +21,7 @@ public static class SceneObjectManager
             nextscene = value;
         }
     }
+    public static Vector2 Playerlocation; //앱 이동후 다시 메인 스테이지로 복귀시 플레이어의 위치를 저장할 좌표.
     /// <summary>
     /// 호출자를 게임 매니저에 추가한다.
     /// </summary>

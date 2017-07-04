@@ -22,16 +22,30 @@ public class Pad : CustomUI,IDragHandler,IPointerDownHandler,IPointerUpHandler
     public void OnDrag(PointerEventData eventData)
     {
         Stickpos = (eventData.position - stickcenter).normalized;
+        if (Mathf.Abs(Stickpos.x) < Mathf.Abs(Stickpos.y)) //y절댓값이 x절댓값보다 큰 경우
+        {
+            Moving = false; //상하 방향키이므로 움직이지 않게 한다.
+            Stickpos.x = 0; //작은쪽의 값을 0으로 한다.
+            if (Stickpos.y < 0) Stickpos.y = -1; //큰쪽의 절댓값을 1로 한다.
+            else if(Stickpos.y>0) Stickpos.y = 1;
+        }
+        else//x절댓값이 y좌표값보다 작거나 같은경우
+        {
+            Moving = true;//좌우 방향키이므로 움직이게 한다.
+            Stickpos.y = 0; //작은쪽의 값을 0으로 한다.
+            if (Stickpos.x < 0) Stickpos.x = -1;//큰쪽의 절댓값을 1로 한다.
+            else if(Stickpos.x>0) Stickpos.x = 1;
+        }
         stick.localPosition = Stickpos * radius;
     }
     public void OnPointerDown(PointerEventData eventData)
     {
-        Moving = true;
         OnDrag(eventData);
     }
     public void OnPointerUp(PointerEventData eventData)
     {
         Moving = false;
+        Stickpos = Vector2.zero;
         stick.localPosition = Vector2.zero;
     }
 }

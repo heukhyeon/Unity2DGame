@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEditorInternal;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Player : Actor
 {
@@ -55,6 +56,7 @@ public class Player : Actor
             Rbody.velocity = spd;
         }
         if (Moving) Move();
+        if (pad.Stickpos.y == 1) Warp();
     }
     protected override void Move()
     {
@@ -62,7 +64,8 @@ public class Player : Actor
         pos.x = (Flip == true ? -1f : 1f) * status.defaultspeed * Time.fixedDeltaTime;
         Rbody.position += pos;
     }
-    public void Dashing()
+
+    /*public void Dashing()
     {
         if (!Bottom) return;
         if (Rbody.velocity.x > 0)
@@ -76,5 +79,19 @@ public class Player : Actor
         Rbody.AddForce(pos, ForceMode2D.Impulse);
         Debug.Log(Rbody.velocity);
         Ani.SetBool("Dashing", true);
+     }*/
+     /// <summary>
+     /// 위쪽 키가 입력되었을때의 처리
+     /// </summary>
+    private void Warp()
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(this.transform.position, this.transform.forward, out hit)&& hit.transform.tag == "App")
+        {
+           SceneObjectManager.Playerlocation = this.transform.position;
+           SceneObjectManager.NextScene = hit.transform.name;
+           SceneManager.LoadSceneAsync("Loading");
+        }
     }
+    
 }
