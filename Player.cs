@@ -25,6 +25,7 @@ public class Player : Actor
         get { return Ani.GetBool("Dashing"); }
         set { Ani.SetBool("Dashing", value); }
     }
+    private bool isWarp = false; //앱 선택이 중복되서 발생하는것방지
     protected override void ActorAwake()
     {
         if (this.gameObject.name != "Player") Debug.LogError("Player 클래스를 가진 객체의 이름은 Player여야만 합니다! :" + this.gameObject.name);
@@ -86,8 +87,9 @@ public class Player : Actor
     private void Warp()
     {
         RaycastHit hit;
-        if (Physics.Raycast(this.transform.position, this.transform.forward, out hit)&& hit.transform.tag == "App")
+        if (Physics.Raycast(this.transform.position, this.transform.forward, out hit)&& hit.transform.tag == "App" && !isWarp)
         {
+            isWarp = true;
            SceneObjectManager.Playerlocation = this.transform.position;
            SceneObjectManager.NextScene = hit.transform.name;
            SceneManager.LoadSceneAsync("Loading");
