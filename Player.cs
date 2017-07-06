@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class Player : Actor
 {
+    [SerializeField]
     private Pad pad;
     public bool Jump
     {
@@ -30,21 +31,9 @@ public class Player : Actor
     {
         if (this.gameObject.name != "Player") Debug.LogError("Player 클래스를 가진 객체의 이름은 Player여야만 합니다! :" + this.gameObject.name);
     }
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject.tag == "Bottom")
-        {
-            Bottom = true;
-            if (Jump) Jump = false;
-        }
-    }
-    private void OnCollisionExit2D(Collision2D collision)
-    {
-        if (collision.gameObject.tag == "Bottom") Bottom = false;
-    }
     private void Start()
     {
-        pad = SceneObjectManager.GetComponent<Pad>();
+        if (pad == null) Debug.LogError("Pad 객체를 삽입해주세요! Player 스크립트 에러");
     }
     private void FixedUpdate()
     {
@@ -59,28 +48,15 @@ public class Player : Actor
         if (Moving) Move();
         if (pad.Stickpos.y == 1) Warp();
     }
+    /// <summary>
+    /// 좌우 키가 입력되었을때의 처리
+    /// </summary>
     protected override void Move()
     {
         Vector2 pos = Vector2.zero;
         pos.x = (Flip == true ? -1f : 1f) * status.defaultspeed * Time.fixedDeltaTime;
         Rbody.position += pos;
     }
-
-    /*public void Dashing()
-    {
-        if (!Bottom) return;
-        if (Rbody.velocity.x > 0)
-        {
-            Vector2 spd = Rbody.velocity;
-            spd.x = 0;
-            Rbody.velocity = spd;
-        }
-        Vector2 pos = Vector2.zero;
-        pos.x += (Flip == true ? -1f : 1f) * status.Dashspeed;
-        Rbody.AddForce(pos, ForceMode2D.Impulse);
-        Debug.Log(Rbody.velocity);
-        Ani.SetBool("Dashing", true);
-     }*/
      /// <summary>
      /// 위쪽 키가 입력되었을때의 처리
      /// </summary>
@@ -90,9 +66,7 @@ public class Player : Actor
         if (Physics.Raycast(this.transform.position, this.transform.forward, out hit)&& hit.transform.tag == "App" && !isWarp)
         {
             isWarp = true;
-           SceneObjectManager.Playerlocation = this.transform.position;
-           SceneObjectManager.NextScene = hit.transform.name;
-           SceneManager.LoadSceneAsync("Loading");
+            CustomSceneManager.goScene(hit.transform, this.transform.position);
         }
     }
     

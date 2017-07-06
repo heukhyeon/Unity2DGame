@@ -7,10 +7,9 @@ using UnityEngine.UI;
 /// 대부분의 객체에 기본적으로 탑재되는 Monobehavior아래 최상위 상속클래스. 
 /// </summary>
 public class CustomObject : MonoBehaviour {
-
     protected virtual void Awake()
     {
-        SceneObjectManager.Add(this.gameObject);
+
     }
 
 }
@@ -139,4 +138,10 @@ public class StateStruct
     public ParameterType parametertype = ParameterType.Bool;
     public string parametername;
     public float parameter = 0f;
+}
+
+interface HeartbarController
+{
+    void HeartCompareComplete();
+    void MissionFail();
 }

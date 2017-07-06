@@ -19,9 +19,7 @@ public class PrologObjects : CustomUI
     /// </summary>
     public void Button1Click()
     {
-        SceneObjectManager.NextScene = "Stage1";
-        SceneObjectManager.Dispose();
-        SceneManager.LoadScene("Loading");
+        CustomSceneManager.goMainScene();
     }
     /// <summary>
     /// 이어하기. 현재 마땅한 기능이 없으므로 레스토랑스가 빙의해있다.

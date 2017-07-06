@@ -8,19 +8,47 @@ using UnityEngine.EventSystems;
 /// <summary>
 /// 메세지 어플에서 화면 중단, 메세지 블록을 드래그하는 창의 스크립트. 메세지어플의 작동과정을 총체적으로 관리한다.
 /// </summary>
-public class MessageBox : CustomUI {
+public class MessageBox : CustomUI,HeartbarController {
 
+    /// <summary>
+    /// 문자열 정답
+    /// </summary>
     [SerializeField]
     private string Answer = "메세지 어플 문자열 정답을 입력해주세요";
+    /// <summary>
+    /// 복제할(메세지바 안에 넣어질 투명한) 메세지 블록
+    /// </summary>
     [SerializeField]
     private GameObject inmessage = null;
+    /// <summary>
+    /// 메세지 바를 감싸는 테두리
+    /// </summary>
+    [SerializeField]
     private RectTransform Centerbar = null;
+    /// <summary>
+    /// 전송 버튼
+    /// </summary>
+    [SerializeField]
     private RectTransform SendButton = null;
-    private RectTransform Messagebar;
+    /// <summary>
+    /// 전송되지 않은(불투명한)메세지 블록들이 나열되있는 메세지 바 아래의 장소
+    /// </summary>
     [SerializeField]
     private RectTransform MessageSpace = null;
+    /// <summary>
+    /// 메세지 스페이스 오른쪽의 스크롤바
+    /// </summary>
     [SerializeField]
     private RectTransform Scrollbar = null;
+    /// <summary>
+    /// 자기 자신의 Recttransform
+    /// </summary>
+    private RectTransform Messagebar;
+    /// <summary>
+    /// 라이프바
+    /// </summary>
+    [SerializeField]
+    private Lifebar lifebar;
     public string nowword = "";
     private List<GameObject> words = new List<GameObject>();
     private short cnt = 0;
@@ -117,14 +145,30 @@ public class MessageBox : CustomUI {
             sb.Append(obj.GetComponentInChildren<UnityEngine.UI.Text>().text);
         Debug.Log(sb.ToString());
         if (sb.ToString() == Answer) Debug.Log("맞았습니다");
-        else Debug.Log("틀렸습니다");
+        else
+        {
+            lifebar.HeartDecrease();
+            Debug.Log("틀렸습니다");
+        }
     }
     protected override void UIAwake()
     {
-        Centerbar = this.transform.parent.GetComponent<RectTransform>();
-        SendButton = Centerbar.GetChild(1).GetComponent<RectTransform>();
+        //Centerbar = this.transform.parent.GetComponent<RectTransform>();
+        //SendButton = Centerbar.GetChild(1).GetComponent<RectTransform>();
         Messagebar = GetComponent<RectTransform>();
+    }
+    private void Start()
+    {
         DEFAULT_POS.y = Messagebar.position.y - Messagebar.sizeDelta.y / 2;
         DEFAULT_POS.x = Messagebar.position.x - Messagebar.sizeDelta.x / 2.65f;
+    }
+
+    public void HeartCompareComplete()
+    {
+        SendButton.GetComponent<UnityEngine.UI.Button>().interactable = true;
+    }
+    public void MissionFail()
+    {
+        Debug.Log("죽었다 새꺄");
     }
 }
