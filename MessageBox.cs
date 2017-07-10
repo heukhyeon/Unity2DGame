@@ -11,15 +11,24 @@ using UnityEngine.EventSystems;
 public class MessageBox : CustomUI,HeartbarController {
 
     /// <summary>
-    /// 문자열 정답
+    /// 메인 스테이지의 MessageAppInfo 난수로부터 전달된 현재 정답.
     /// </summary>
-    [SerializeField]
     private string Answer = "메세지 어플 문자열 정답을 입력해주세요";
     /// <summary>
     /// 복제할(메세지바 안에 넣어질 투명한) 메세지 블록
     /// </summary>
     [SerializeField]
     private GameObject inmessage = null;
+    /// <summary>
+    /// 메세지 공간에 배치될 불투명한 블록
+    /// </summary>
+    [SerializeField]
+    private GameObject Messageblock = null;
+    /// <summary>
+    /// MessageSpace의 Viewport
+    /// </summary>
+    [SerializeField]
+    private RectTransform Viewport = null;
     /// <summary>
     /// 메세지 바를 감싸는 테두리
     /// </summary>
@@ -55,6 +64,31 @@ public class MessageBox : CustomUI,HeartbarController {
     private const short MESSAGEBLOCKHEIGHT = 45; //메세지 박스에 등록되는 메세지 블록의 기본 높이
     private const short MESSAGEBLOCKWIDTH = 150; //메세지 박스에 등록되는 메세지 블록의 기본 너비
     private Vector2 DEFAULT_POS;
+
+    protected override void UIAwake()
+    {
+        MessageAppInfo info = CustomSceneManager.apps.message;
+        Answer = info.Answer;
+        for(int i=0;i<info.Words.Length;i++) // 무작위로 섞는다.
+        {
+            int loc1 = UnityEngine.Random.Range(0, info.Words.Length);
+            int loc2 = UnityEngine.Random.Range(0, info.Words.Length);
+            string temp = info.Words[loc1];
+            info.Words[loc1] = info.Words[loc2];
+            info.Words[loc2] = temp;
+        }
+
+        for(int i=0;i<info.Words.Length;i++) //섞인 문자열배열에서 순서대로 문자열을 뽑는다.
+        {
+            GameObject obj = Instantiate(Messageblock, MessageSpace, false);
+            obj.GetComponentInChildren<UnityEngine.UI.Text>().text = info.Words[i];
+            int h_loc = -((i / 3) * 150 + 50); 
+            int w_loc = (i % 3) * 230 + 110;
+            obj.GetComponent<RectTransform>().localPosition = new Vector2(w_loc, h_loc);
+        }
+        Messagebar = GetComponent<RectTransform>();
+        Debug.Log(info.Answer);
+    }
     /// <summary>
     /// OnDrop시 호출되는 메소드 
     /// </summary>
@@ -109,8 +143,8 @@ public class MessageBox : CustomUI,HeartbarController {
         RectHeightChange(Messagebar, increase, true);
         RectHeightChange(Centerbar, increase, true);
         RectHeightChange(SendButton, increase, true);
-        //MessageSpace와 스크롤바의 증가량은 위 3개와 반비례한다.  또한 스크롤바는 90도 회전한 상태이므로 x축을 편집하기위해 3번째 매개변수를 false로 둔다.
-        RectHeightChange(MessageSpace, !increase, true);
+        //ViewPort와 스크롤바의 증가량은 위 3개와 반비례한다.  또한 스크롤바는 90도 회전한 상태이므로 x축을 편집하기위해 3번째 매개변수를 false로 둔다.
+        RectHeightChange(Viewport, !increase, true);
         RectHeightChange(Scrollbar, !increase, false);
         float rate = MESSAGEBLOCKHEIGHT / 2f;
         rate = increase == true ? rate : -rate;
@@ -151,12 +185,6 @@ public class MessageBox : CustomUI,HeartbarController {
             Debug.Log("틀렸습니다");
         }
     }
-    protected override void UIAwake()
-    {
-        //Centerbar = this.transform.parent.GetComponent<RectTransform>();
-        //SendButton = Centerbar.GetChild(1).GetComponent<RectTransform>();
-        Messagebar = GetComponent<RectTransform>();
-    }
     private void Start()
     {
         DEFAULT_POS.y = Messagebar.position.y - Messagebar.sizeDelta.y / 2;
@@ -169,6 +197,6 @@ public class MessageBox : CustomUI,HeartbarController {
     }
     public void MissionFail()
     {
-        Debug.Log("죽었다 새꺄");
+        Debug.Log("죽었습니다!");
     }
 }

@@ -66,6 +66,19 @@ public class Player : Actor
         if (Physics.Raycast(this.transform.position, this.transform.forward, out hit)&& hit.transform.tag == "App" && !isWarp)
         {
             isWarp = true;
+            Apps app = hit.transform.GetComponent<Apps>();
+            switch(app.kind)
+            {
+                case AppKind.Message:
+                    app.message.goApp();
+                    break;
+                case AppKind.Internet:
+                    app.internet.goApp();
+                    break;
+                case AppKind.Null:
+                    Debug.LogError("앱 종류가 없습니다! :" + app.gameObject.name);
+                    break;
+            }
             CustomSceneManager.goScene(hit.transform, this.transform.position);
         }
     }

@@ -10,7 +10,6 @@ using UnityEngine.UI;
 /// </summary>
 public class MessageBlock : CustomUI,IPointerDownHandler,IPointerUpHandler,IDragHandler
 {
-    [SerializeField]
     private MessageBox messagebox = null; //드랍시 블록이 생성될 메세지 박스
     private Vector3 defaultpos;
     private Text messageword;
@@ -29,7 +28,11 @@ public class MessageBlock : CustomUI,IPointerDownHandler,IPointerUpHandler,IDrag
     }
     protected override void UIAwake()
     {
-        defaultpos = this.transform.localPosition;
         messageword = this.GetComponentInChildren<Text>();
+        messagebox = this.transform.root.GetComponentsInChildren<MessageBox>()[0];
+    }
+    private void Start()
+    {
+        defaultpos = this.transform.localPosition;
     }
 }

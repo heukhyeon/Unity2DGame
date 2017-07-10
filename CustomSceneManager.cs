@@ -9,6 +9,7 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public static class CustomSceneManager
 {
+
     /// <summary>
     /// 다음 씬으로 넘어갈 씬 인덱스
     /// </summary>
@@ -25,11 +26,15 @@ public static class CustomSceneManager
     /// 씬 빌드 목록에서, 어플리케이션 목록 이전에 빌드된 씬(메인 스테이지, 인트로 등)의 수. 
     /// 해당 변수 + goScene에서 받은 Transform의 부모에 대한 자신의 index를 더한것이 실제 이동씬 index가 된다.
     /// </summary>
-    private const byte BEFOREAPPCOUNT = 2;
+    private const byte BEFOREAPPCOUNT = 3;
     /// <summary>
     /// 최대 하트수. 난이도에 따라 메인 스테이지에서 조정가능.
     /// </summary>
     public static byte MAXHEARTS = 3;
+    /// <summary>
+    /// 각 어플에 대한 정답등을 보관한다. 어플 진입시 각 어플에서 해당 변수에 자신들이 가진 클래스를 대입하는 방식.
+    /// </summary>
+    public static AppManager apps;
     /// <summary>
     /// 메인 스테이지로 복귀시 플레이어 객체 위치
     /// </summary>
@@ -60,6 +65,7 @@ public static class CustomSceneManager
             if (obj == app) break;
             sceneindex++;
         }
+        Debug.Log(sceneindex);
         playerlocation = position;
         SceneManager.LoadSceneAsync(LOADINGINDEX);
     }
@@ -78,4 +84,12 @@ public static class CustomSceneManager
     {
         return playerlocation;
     }
+}
+/// <summary>
+/// 각 어플들에 대한 문제등을 담고있는 클래스
+/// </summary>
+public struct AppManager
+{
+    public InternetAppInfo internet;
+    public MessageAppInfo message;
 }
