@@ -85,22 +85,19 @@ public abstract class Actor : CustomObject
 }
 
 /// <summary>
-/// UI 오브젝트들이 상속하는 클래스. 해상도 비율에 따른 크기 재조정.
+/// UI 오브젝트들이 상속하는 클래스. 
 /// </summary>
 public abstract class CustomUI : CustomObject
 {
-    protected float RATE;
+    //protected float RATE;
     protected RectTransform recttransform;
     protected override sealed void Awake()
     {
-        base.Awake();
         recttransform = GetComponent<RectTransform>();
-        RATE = Screen.width / 720f > Screen.height / 1280f ? Screen.width / 720f : Screen.height / 1280f;
-        Resize(recttransform);
-        Reposition();
         UIAwake();
     }
     protected abstract void UIAwake();
+    /* 다해상도 미지원 관계로 보류
     /// <summary>
     /// 해상도에 맞게 UI 크기를 조정한다.
     /// </summary>
@@ -117,6 +114,7 @@ public abstract class CustomUI : CustomObject
     {
         this.transform.position = new Vector2(this.transform.position.x * RATE, this.transform.position.y * RATE);
     }
+    */
 }
 [Serializable]
 public class Status

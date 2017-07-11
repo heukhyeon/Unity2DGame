@@ -13,6 +13,7 @@ public class MessageAppInfo
     public string[] Words;
 }
 
+
 /// <summary>
 /// 인터넷 앱에 대한 정답. 이미지 분포 등을 저장하는 클래스. 메인 스테이지에서 해당 클래스의 배열을 만들어둔뒤 난수(또는 임의의수) 인덱스로 전달
 /// </summary>

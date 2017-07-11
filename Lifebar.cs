@@ -18,6 +18,8 @@ public class Lifebar:CustomUI
     /// </summary>
     private HeartbarController controller = null;
     private RectTransform panel;
+    [SerializeField]
+    private PlayerSpeechEvent speecheventer = null;
     private byte cnt = 0;
     protected override void UIAwake()
     {
@@ -44,11 +46,22 @@ public class Lifebar:CustomUI
             yield return new WaitForSeconds(0.5f);
         }
         controller.HeartCompareComplete();
+        speecheventer.SetScript(SpeechStatus.Entry);
+        speecheventer.gameObject.SetActive(true);
     }
     public void HeartDecrease()
     {
         Destroy(this.transform.GetChild(cnt - 1).gameObject);
         cnt--;
-        if (this.transform.childCount == 0) controller.MissionFail();
+        if(cnt<=0)
+        {
+            speecheventer.gameObject.SetActive(true);
+            speecheventer.SetScript(SpeechStatus.GameOver);
+        }
+        else
+        {
+            speecheventer.gameObject.SetActive(true);
+            speecheventer.SetScript(SpeechStatus.Fail);
+        }
     }
 }

@@ -9,8 +9,10 @@ public interface MainStageApps
 {
     void goApp();
 }
-
-public enum AppKind { Null, Message, Internet }
+[Serializable]
+public enum AppKind { Null,Message, Internet, Gallery, Calculator, Camera, BallMove, SNS, Dictionary, Youtube, Notice, Music, Garbage }
+[Serializable]
+public enum AppStatus { NotOpen,NotClear,Clear }
 [Serializable]
 public class Apps:MonoBehaviour
 {

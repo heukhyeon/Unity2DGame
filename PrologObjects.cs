@@ -12,13 +12,14 @@ public class PrologObjects : CustomUI
 {
     protected override void UIAwake()
     {
-        
+        Screen.SetResolution(540, 960, false);
     }
     /// <summary>
     /// 새로하기
     /// </summary>
     public void Button1Click()
     {
+        CustomSceneManager.savedata = new SaveData(false);
         CustomSceneManager.goMainScene();
     }
     /// <summary>
@@ -26,7 +27,8 @@ public class PrologObjects : CustomUI
     /// </summary>
     public void Button2Click()
     {
-        Application.OpenURL("http://kr.battle.net/heroes/ko/");
+        CustomSceneManager.savedata = new SaveData(true);
+        CustomSceneManager.goMainScene();
     }
     /// <summary>
     /// 업적

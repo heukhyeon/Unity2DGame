@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -9,7 +11,9 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public static class CustomSceneManager
 {
-
+    public static SaveData savedata;
+    public static readonly string savepath = Application.dataPath + "save.bin";
+    public static byte batterylife = 100;
     /// <summary>
     /// 다음 씬으로 넘어갈 씬 인덱스
     /// </summary>
@@ -65,7 +69,6 @@ public static class CustomSceneManager
             if (obj == app) break;
             sceneindex++;
         }
-        Debug.Log(sceneindex);
         playerlocation = position;
         SceneManager.LoadSceneAsync(LOADINGINDEX);
     }
@@ -75,7 +78,7 @@ public static class CustomSceneManager
     public static void goMainScene()
     {
         sceneindex = MAINSCENEINDEX;
-        SceneManager.LoadSceneAsync(MAINSCENEINDEX);
+        SceneManager.LoadSceneAsync(LOADINGINDEX);
     }
     /// <summary>
     /// 어플리케이션에서 메인 스테이지로 복귀시 기존 플레이어 위치를 반환한다.
@@ -93,3 +96,42 @@ public struct AppManager
     public InternetAppInfo internet;
     public MessageAppInfo message;
 }
+
+/// <summary>
+/// 저장소 
+/// </summary>
+[Serializable]
+public struct SaveData
+{
+    /// <summary>
+    /// 진입 이벤트를 볼지 안볼지 여부. 각 어플별로 나뉜다.
+    /// </summary>
+    public Dictionary<AppKind, AppStatus> Appstatus;
+    public ItemInfo[] getItem;
+    public byte battery;
+    public SaveData(bool load)
+    {
+        if(load)
+        {
+            BinaryFormatter formatter = new BinaryFormatter();
+            FileStream stream = new FileStream(CustomSceneManager.savepath, FileMode.Open);
+            SaveData savedata = (SaveData)formatter.Deserialize(stream);
+            Appstatus = savedata.Appstatus;
+            getItem = savedata.getItem;
+            battery = savedata.battery;
+            stream.Close();
+        }
+        else
+        {
+            Appstatus = new Dictionary<AppKind, AppStatus>();
+            foreach (AppKind kind in Enum.GetValues(typeof(AppKind)))
+            {
+                if (kind == AppKind.Null) continue;
+                Appstatus.Add(kind, AppStatus.NotOpen);
+            }
+            getItem = new ItemInfo[9];
+            battery = 100;
+        }
+    }
+}
+

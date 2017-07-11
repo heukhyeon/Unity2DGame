@@ -57,7 +57,7 @@ public class MessageBox : CustomUI,HeartbarController {
     /// 라이프바
     /// </summary>
     [SerializeField]
-    private Lifebar lifebar;
+    private Lifebar lifebar = null;
     public string nowword = "";
     private List<GameObject> words = new List<GameObject>();
     private short cnt = 0;
@@ -87,7 +87,6 @@ public class MessageBox : CustomUI,HeartbarController {
             obj.GetComponent<RectTransform>().localPosition = new Vector2(w_loc, h_loc);
         }
         Messagebar = GetComponent<RectTransform>();
-        Debug.Log(info.Answer);
     }
     /// <summary>
     /// OnDrop시 호출되는 메소드 

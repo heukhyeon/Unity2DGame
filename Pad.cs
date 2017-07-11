@@ -15,9 +15,11 @@ public class Pad : CustomUI,IDragHandler,IPointerDownHandler,IPointerUpHandler
     protected override void UIAwake()
     {
         stick = this.transform.GetChild(0).GetComponent<RectTransform>();
-        Resize(stick);
+    }
+    private void Start()
+    {
         radius = recttransform.sizeDelta.x * 0.5f;
-        stickcenter = this.transform.position;
+        stickcenter = recttransform.position;
     }
     public void OnDrag(PointerEventData eventData)
     {
