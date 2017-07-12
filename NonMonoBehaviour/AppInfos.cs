@@ -37,7 +37,7 @@ public class InternetAppInfo
     public struct KnowInInfo
     {
         public bool EnableImage;
-        public Image image;
+        public Sprite image;
         public string QuestionerTitle;
         public string QuestionerContent;
         public string AnswerContent;
@@ -55,7 +55,7 @@ public class InternetAppInfo
     public string answer; //정답
     public string[] relations; //연관 검색어들 배열.
     public DictionaryInfo[] dictionarys; //사전 배열
-    public Image[] images;
+    public Sprite[] images;
     public KnowInInfo[] knowins;
     public SiteInfo[] sites;
 }

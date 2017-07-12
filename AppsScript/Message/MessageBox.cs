@@ -98,9 +98,9 @@ public class MessageBox : CustomUI,HeartbarController {
         GameObject obj = Instantiate(inmessage, this.transform);
         obj.GetComponentInChildren<UnityEngine.UI.Text>().text = nowword;
         Vector2 pos = Vector2.zero;
-        pos.y = DEFAULT_POS.y - ((cnt / 4) * MESSAGEBLOCKHEIGHT);
-        pos.x = DEFAULT_POS.x + ((cnt % 4) * MESSAGEBLOCKWIDTH);
-        obj.transform.position = pos;
+        pos.y = -((cnt / 4) * MESSAGEBLOCKHEIGHT) / 2f; 
+        pos.x = ((cnt % 4) * MESSAGEBLOCKWIDTH);
+        obj.transform.localPosition = pos;
         obj.name = "InMessage" + cnt;
         words.Add(obj);
         UnityEngine.UI.Button btn = obj.GetComponent<UnityEngine.UI.Button>();
@@ -115,16 +115,14 @@ public class MessageBox : CustomUI,HeartbarController {
     /// <param name="name"></param>
     public void Delete(string name)
     {
-        Debug.Log(words.Count);
         int rate = cnt / 4;
         int loc = int.Parse(System.Text.RegularExpressions.Regex.Replace(name, @"\D", ""));
         Vector2 pos = words[loc].transform.localPosition;
         Destroy(words[loc]);
         words.Remove(words[loc]);
-        for(int i=0;i<words.Count;i++)
+        for(int i=loc;i<words.Count;i++)
         {
-            words[i].name = "InMessage" + i; //인덱스를 이름끝의 번호로 삼으므로 중간 블록을 삭제한경우를 위한 전체 인덱스 번호를 재지정한다.
-            if (i < loc) continue; // 삭제하기 이전 블록은 위치변경을 하지 않는다.
+            words[i].name = "InMessage" + i; //인덱스를 이름끝의 번호로 삼으므로 번호 재지정
             Vector2 backup = words[i].transform.localPosition;
             words[i].transform.localPosition = pos;
             pos = backup;
@@ -149,9 +147,9 @@ public class MessageBox : CustomUI,HeartbarController {
         rate = increase == true ? rate : -rate;
         for (int i = 0; i < words.Count; i++)
         {
-            Vector2 size = words[i].transform.position;
+            Vector2 size = words[i].transform.localPosition;
             size.y += rate;
-            words[i].transform.position = size;
+            //words[i].transform.localPosition = size;
         }
     }
     /// <summary>

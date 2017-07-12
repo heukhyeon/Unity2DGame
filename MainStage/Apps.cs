@@ -27,7 +27,9 @@ public class InternetApp : MainStageApps
     public List<InternetAppInfo> cases;
     public void goApp()
     {
-        CustomSceneManager.apps.internet = cases[UnityEngine.Random.Range(0, cases.Count)];
+        //CustomSceneManager.apps.internet = cases[UnityEngine.Random.Range(0, cases.Count)];
+        CustomSceneManager.apps.internet = cases[2];
+        Debug.Log(cases[1].answer);
     }
 }
 

@@ -33,6 +33,7 @@ public class InternetBox : CustomUI,HeartbarController {
     [SerializeField]
     private GameObject RefferenceImage = null;
     private Vector2 pos = Vector2.zero;
+
     public void HeartCompareComplete()
     {
         
@@ -42,15 +43,14 @@ public class InternetBox : CustomUI,HeartbarController {
     {
         
     }
-
-    protected override void UIAwake()
+    private void Start()
     {
         // 연관 검색어 -> 사이트 -> 사전-> 이미지 -> 지식인 순으로 처리.
         // 모든 컴포넌트는 표시할 필요가 없는경우 (연관검색어의 경우 연관검색어가 없다던지) 해당 객체를 지운다.
         //연관검색어 처리
         InternetAppInfo internet = CustomSceneManager.apps.internet;
         Text[] objtexts;
-        if (internet.relations.Length == 0)Destroy(relation.transform.parent.gameObject);
+        if (internet.relations.Length == 0) Destroy(relation.transform.parent.gameObject);
         else
         {
             StringBuilder sb = new StringBuilder();
@@ -64,7 +64,7 @@ public class InternetBox : CustomUI,HeartbarController {
         else
         {
             setPos(Site);
-            for(int i=0;i<internet.sites.Length;i++)
+            for (int i = 0; i < internet.sites.Length; i++)
             {
                 GameObject obj = Instantiate(SiteBlock, Site.transform, false);
                 obj.name = "Site" + (i + 1);
@@ -81,11 +81,13 @@ public class InternetBox : CustomUI,HeartbarController {
         else
         {
             setPos(Dictionary);
-            for(int i=0;i<internet.dictionarys.Length;i++)
+            Debug.Log(Dictionary.GetComponent<RectTransform>().localPosition);
+            for (int i = 0; i < internet.dictionarys.Length; i++)
             {
                 GameObject obj = Instantiate(DictionaryBlock, Dictionary.transform, false);
                 obj.name = "Dictionary" + (i + 1);
-                obj.transform.localPosition= new Vector2(0, -(i * 130 + 60));
+                obj.transform.localPosition = new Vector2(0, -(i * 130 + 60));
+                Debug.Log(obj.transform.localPosition);
                 objtexts = obj.GetComponentsInChildren<Text>();
                 objtexts[0].text = internet.dictionarys[i].name;
                 objtexts[1].text = internet.dictionarys[i].content;
@@ -97,12 +99,12 @@ public class InternetBox : CustomUI,HeartbarController {
         else
         {
             setPos(RefferenceImages);
-            for(int i=0;i<internet.images.Length;i++)
+            for (int i = 0; i < internet.images.Length; i++)
             {
                 GameObject obj = Instantiate(RefferenceImage, RefferenceImages.transform, false);
                 obj.name = "RefferenceImage" + (i + 1);
-                obj.transform.localPosition = new Vector2(i%3 * 235f, -(60 + i * 235f));
-                obj.GetComponent<Image>().sprite = internet.images[i].sprite;
+                obj.transform.localPosition = new Vector2(i % 3 * 235f - 350f, -(30 + i/3 * 235f));
+                obj.GetComponent<Image>().overrideSprite = internet.images[i];
                 pos.y = i % 3 == 0 ? pos.y + 220f : pos.y;
             }
         }
@@ -111,29 +113,38 @@ public class InternetBox : CustomUI,HeartbarController {
         else
         {
             setPos(KnowIn);
-            int notcnt = 0; //똑같은 지식인 카테고리 내부여도 이미지를 표시하는 질문과 표시하지 않는 질문이 있을수있으므로 표시되지 않은 카운트
-            for(int i=0;i<internet.knowins.Length;i++)
+            for (int i = 0; i < internet.knowins.Length; i++)
             {
                 GameObject obj = Instantiate(KnowInBlock, KnowIn.transform, false);
                 obj.name = "KnowIn" + (i + 1);
                 obj.transform.localPosition = new Vector2(0, -(60 + i * 190f));
+                objtexts = obj.transform.GetChild(1).GetComponentsInChildren<Text>();
+                objtexts[1].text = internet.knowins[i].QuestionerTitle;
+                objtexts[2].text = internet.knowins[i].QuestionerContent;
+                obj.transform.GetChild(2).GetComponentsInChildren<Text>()[1].text = internet.knowins[i].AnswerContent;
                 if (internet.knowins[i].EnableImage)//현재 지식인 항목이 이미지를 쓰는경우
-                    obj.GetComponentInChildren<Image>().sprite = internet.knowins[i-notcnt].image.sprite;
+                {
+                    obj.GetComponentsInChildren<Image>()[1].sprite = internet.knowins[i].image;
+                }
                 else //현재 지식인 항목이 이미지를 쓰지 않는경우
                 {
-                    notcnt++;
-                    Destroy(obj.transform.GetChild(0).gameObject); //이미지 제거
-                    Vector2 size = new Vector2(690, 85);
-                    obj.transform.GetChild(0).localPosition = Vector2.zero;
-                    obj.transform.GetChild(0).GetComponent<RectTransform>().sizeDelta = size;
-                    size.y += 15;
-                    obj.transform.GetChild(1).localPosition = new Vector2(0, -85);
+                    Vector2 size = new Vector2(700, 85);
+                    obj.transform.GetChild(1).localPosition = Vector2.zero;
+                    Debug.Log(obj.transform.GetChild(1).name);
                     obj.transform.GetChild(1).GetComponent<RectTransform>().sizeDelta = size;
+                    size.y += 15;
+                    obj.transform.GetChild(2).localPosition = new Vector2(0, -85f);
+                    obj.transform.GetChild(2).GetComponent<RectTransform>().sizeDelta = size;
+                    Destroy(obj.transform.GetChild(0).gameObject); //이미지 제거
                 }
                 pos.y += 190;
             }
         }
-        this.transform.GetComponent<RectTransform>().sizeDelta = new Vector2(720, pos.y + 100);
+        if(pos.y<1060) this.transform.GetComponent<RectTransform>().sizeDelta = new Vector2(720, 1060);
+        else this.transform.GetComponent<RectTransform>().sizeDelta = new Vector2(720, pos.y + 100);
+    }
+    protected override void UIAwake()
+    {
     }
     public void KewordSend()
     {
@@ -141,7 +152,7 @@ public class InternetBox : CustomUI,HeartbarController {
     }
     private void setPos(GameObject obj)
     {
-        obj.transform.localPosition = new Vector2(0, -pos.y);
+        obj.GetComponent<RectTransform>().localPosition = new Vector2(0, -pos.y);
         pos.y += 60f;
     }
 }

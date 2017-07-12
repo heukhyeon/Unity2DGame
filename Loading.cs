@@ -10,7 +10,7 @@ using System.Text;
 /// </summary>
 public class Loading : MonoBehaviour {
     [SerializeField]
-    private float minTime = 3f; //로딩씬이 유지되는 최소 시간
+    private float minTime = 0f; //로딩씬이 유지되는 최소 시간
     [SerializeField]
     private Slider sliderbar = null; //하단 슬라이더바
     [SerializeField]
