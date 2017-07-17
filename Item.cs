@@ -1,24 +1,14 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.UI;
 
-[Serializable]
 public class Item:MonoBehaviour
 {
-    public ItemInfo info;
-}
-[Serializable]
-public class ItemInfo
-{
-    /// <summary>
-    /// 아이템 이름
-    /// </summary>
+    public ItemType type;
     public string name;
-    /// <summary>
-    /// Resource에서 찾을 아이템 프리팹 이름
-    /// </summary>
-    public string path;
-    /// <summary>
-    /// 아이템 설명
-    /// </summary>
     public string content;
+    public Image border;
+    private void Start()
+    {
+        border = this.transform.parent.GetComponent<Image>();
+    }
 }
