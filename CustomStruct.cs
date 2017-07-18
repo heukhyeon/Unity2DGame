@@ -128,10 +128,12 @@ public struct AppInfo
     public AppSpeechArray speecharray;
     public MessageAppInfo messageinfo;
     public InternetAppInfo internetinfo;
+    public DictionaryAppInfo dictionaryinfo;
     public void Dispose()
     {
         messageinfo = new MessageAppInfo();
         internetinfo = new InternetAppInfo();
+        dictionaryinfo = new DictionaryAppInfo();
     }
 }
 [Serializable]
@@ -177,4 +179,17 @@ public struct InternetAppInfo
     public EncyclopediaBlock[] encyclopediablock;
     public SiteBlock[] siteblock;
     public KnowInBlock[] knowinblock;
+}
+[Serializable]
+public struct DictionaryAppInfo
+{
+    [Serializable]
+    public struct DictionaryWord
+    {
+        public Vector2 Start_loc; //시작 지점
+        public string word; //답 글자
+        public string hint;// 힌트
+    }
+    public DictionaryWord[] Streetwords;
+    public DictionaryWord[] Columnwords;
 }
