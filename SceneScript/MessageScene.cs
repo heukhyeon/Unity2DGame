@@ -192,7 +192,7 @@ public class MessageScene : MonoBehaviour,AppSceneScript {
     }
     public void GameOver()//게임오버 스크립트 진행후
     {
-        StaticManager.SaveData.battery -= 50;
+        StaticManager.SaveData.battery -= 5;
         StaticManager.moveScenetoLoading("MainStage");
     }
     private void EventAdd(GameObject obj) //PointerDown,PointerUp,Drag에 대한 이벤트 추가

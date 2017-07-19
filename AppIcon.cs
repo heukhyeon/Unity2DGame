@@ -13,4 +13,6 @@ public class AppIcon:MonoBehaviour
     public MessageAppInfo[] messageinfo;
     [SerializeField]
     public InternetAppInfo[] internetinfo;
+    [SerializeField]
+    public DictionaryAppInfo[] dictionaryinfo;
 }

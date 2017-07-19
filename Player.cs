@@ -68,6 +68,9 @@ public class Player:MonoBehaviour
             case AppCategory.Internet:
                 StaticManager.Nowappinfo.internetinfo = app.internetinfo[Random.Range(0, app.internetinfo.Length - 1)];
                 break;
+            case AppCategory.Dictionary:
+                StaticManager.Nowappinfo.dictionaryinfo = app.dictionaryinfo[Random.Range(0, app.dictionaryinfo.Length - 1)];
+                break;
         }
         StaticManager.moveScenetoLoading(app.category.ToString());
     }

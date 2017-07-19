@@ -90,7 +90,8 @@ public struct SaveData //세이브 데이터
             itemlist = new List<string>();
             Prologueclear = false;
             foreach (AppCategory app in Enum.GetValues(typeof(AppCategory)))
-                clearstate.Add(app, AppState.Rejected);
+                //clearstate.Add(app,AppState.Rejected);
+                clearstate.Add(app, AppState.Clear);
         }
         else
         {
@@ -186,10 +187,23 @@ public struct DictionaryAppInfo
     [Serializable]
     public struct DictionaryWord
     {
-        public Vector2 Start_loc; //시작 지점
         public string word; //답 글자
         public string hint;// 힌트
+        public int num; //문제 번호
+        public bool isStreet; //가로 문제 여부 (false시 세로 문제)
+        public CustomVector Start_loc;
     }
-    public DictionaryWord[] Streetwords;
-    public DictionaryWord[] Columnwords;
+    public DictionaryWord[] words;
+}
+
+[Serializable]
+public struct CustomVector
+{
+    public int x;
+    public int y;
+    public CustomVector(int loc_x,int loc_y)
+    {
+        x = loc_x;
+        y = loc_y;
+    }
 }
