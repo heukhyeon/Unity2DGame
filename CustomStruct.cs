@@ -90,8 +90,8 @@ public struct SaveData //세이브 데이터
             itemlist = new List<string>();
             Prologueclear = false;
             foreach (AppCategory app in Enum.GetValues(typeof(AppCategory)))
-                //clearstate.Add(app,AppState.Rejected);
-                clearstate.Add(app, AppState.Clear);
+                clearstate.Add(app,AppState.Rejected);
+                //clearstate.Add(app, AppState.Rejected);
         }
         else
         {
