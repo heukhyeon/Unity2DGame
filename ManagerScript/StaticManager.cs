@@ -6,6 +6,7 @@ public static class StaticManager
     private static string nextscene;
     private static string savepath;
     private static AppSpeechArray appspeecharray;
+    private static CutSceneInfo cutscene;
     public static AppInfo Nowappinfo;
     public static string SavePath
     {
@@ -16,6 +17,11 @@ public static class StaticManager
     {
         get { return appspeecharray; }
         set { appspeecharray = value; }
+    }
+    public static CutSceneInfo CutScene
+    {
+        get { return cutscene; }
+        set { cutscene = value; }
     }
 #region 로딩, 씬 이동 관련
     /// <summary>

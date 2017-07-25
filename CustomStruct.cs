@@ -108,6 +108,38 @@ public struct SaveData //세이브 데이터
 }
 
 [Serializable]
+public struct CutSceneInfo:IDisposable //컷신에 사용될 구조체. 프롤로그/중간씬 호출 객체 /엔딩 객체(아마도 설정어플)에 탑재되 필요시 정적 매니저 객체에 옮기는 방식.
+{
+    public CutInfo[] cuts;
+    public string nextscene;
+    public Sprite[] GetSprites()
+    {
+        int cnt = cuts.Length;
+        Sprite[] ret = new Sprite[cnt];
+        for (int i = 0; i < cnt; i++)
+            ret[i] = cuts[i].sprite;
+        return ret;
+    }
+    public void Dispose()
+    {
+        foreach (CutInfo cut in cuts)
+            cut.Dispose();
+        nextscene = null;
+    }
+}
+[Serializable]
+public struct CutInfo:IDisposable
+{
+    public Sprite sprite;
+    public string[] speech;
+
+    public void Dispose()
+    {
+        sprite = null;
+        speech = null;
+    }
+}
+[Serializable]
 public struct SpeechData //하나의 이벤트 대사에 대한 구조체.
 {
     public SpeechState state; //주인공 표정
