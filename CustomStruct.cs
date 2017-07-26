@@ -8,6 +8,7 @@ using UnityEngine;
 #region 열거형 모음
 public enum AppCategory
 {
+    Null,
     [Description("메세지")]
     Message,
     [Description("인터넷")]
@@ -156,49 +157,88 @@ public struct AppSpeechArray //각 앱에서 주 이벤트마다 사용될 이�
 }
 
 [Serializable]
-public struct AppInfo
+public struct AppInfo:IDisposable
 {
+    public AppCategory beforeapp;
     public AppSpeechArray speecharray;
     public MessageAppInfo messageinfo;
     public InternetAppInfo internetinfo;
     public DictionaryAppInfo dictionaryinfo;
+    public GalleryAppInfo galleryinfo;
     public void Dispose()
     {
-        messageinfo = new MessageAppInfo();
-        internetinfo = new InternetAppInfo();
-        dictionaryinfo = new DictionaryAppInfo();
+        switch(beforeapp)
+        {
+            case AppCategory.Message:
+                messageinfo.Dispose();
+                break;
+            case AppCategory.Internet:
+                internetinfo.Dispose();
+                break;
+            case AppCategory.Dictionary:
+                dictionaryinfo.Dispose();
+                break;
+            case AppCategory.Gallery:
+                galleryinfo.Dispose();
+                break;
+        }
     }
 }
 [Serializable]
-public struct MessageAppInfo
+public struct MessageAppInfo:IDisposable
 {
     [Serializable]
-    public struct MessageStructure //MessageApp에서 배치될 대화 목록
+    public struct MessageStructure:IDisposable //MessageApp에서 배치될 대화 목록
     {
         public Speaker speaker; //메세지 방향 (Other인경우 왼쪽, Hero인경우 오른쪽)
         public string speech; //대화 내용
         public bool isAnswer; // 배치하지않는것이 정답인경우 false로 둔다.
+
+        public void Dispose()
+        {
+            speech = null;
+            isAnswer = false;
+        }
     }
     public MessageStructure[] messagestruct;
+
+    public void Dispose()
+    {
+        foreach (MessageStructure structure in messagestruct)
+            structure.Dispose();
+    }
 }
 [Serializable]
-public struct InternetAppInfo
+public struct InternetAppInfo:IDisposable
 {
     [Serializable]
-    public struct EncyclopediaBlock
+    public struct EncyclopediaBlock:IDisposable
     {
         public string name;
         public string content;
+
+        public void Dispose()
+        {
+            name = null;
+            content = null;
+        }
     }
     [Serializable]
-    public struct SiteBlock
+    public struct SiteBlock:IDisposable
     {
         public string name;
         public string url;
         public string content;
+
+        public void Dispose()
+        {
+            name = null;
+            url = null;
+            content = null;
+        }
     }
     [Serializable]
-    public struct KnowInBlock
+    public struct KnowInBlock: IDisposable
     {
         public bool ImageEnable; //이미지 존재여부 
         public bool AnswerEnable; //답변 존재여부
@@ -206,15 +246,32 @@ public struct InternetAppInfo
         public string questiontitle;
         public string questioncontent;
         public string answercontent;
+
+        public void Dispose()
+        {
+            image = null;
+            questiontitle = null;
+            questioncontent = null;
+            answercontent = null;
+        }
     }
     public string[] answer;
     public string[] relationwords;
     public EncyclopediaBlock[] encyclopediablock;
     public SiteBlock[] siteblock;
     public KnowInBlock[] knowinblock;
+
+    public void Dispose()
+    {
+        answer = null;
+        relationwords = null;
+        encyclopediablock = null;
+        siteblock = null;
+        knowinblock = null;
+    }
 }
 [Serializable]
-public struct DictionaryAppInfo
+public struct DictionaryAppInfo:IDisposable
 {
     [Serializable]
     public struct DictionaryWord
@@ -226,6 +283,23 @@ public struct DictionaryAppInfo
         public CustomVector Start_loc;
     }
     public DictionaryWord[] words;
+
+    public void Dispose()
+    {
+        words = null;
+    }
+}
+
+[Serializable]
+public struct GalleryAppInfo:IDisposable
+{
+    public Texture2D image;
+    public int PuzzleNumber;
+
+    public void Dispose()
+    {
+        image = null;
+    }
 }
 
 [Serializable]
