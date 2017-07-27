@@ -21,8 +21,8 @@ public enum AppCategory
     Camera,
     [Description("공튀기기")]
     BallMove,
-    [Description("SNS")]
-    SNS,
+    [Description("톡")]
+    Talk,
     [Description("사전")]
     Dictionary,
     [Description("유튜브")]
@@ -165,6 +165,7 @@ public struct AppInfo:IDisposable
     public InternetAppInfo internetinfo;
     public DictionaryAppInfo dictionaryinfo;
     public GalleryAppInfo galleryinfo;
+    public TalkAppInfo talkinfo;
     public void Dispose()
     {
         switch(beforeapp)
@@ -181,7 +182,31 @@ public struct AppInfo:IDisposable
             case AppCategory.Gallery:
                 galleryinfo.Dispose();
                 break;
+            case AppCategory.Talk:
+                talkinfo.Dispose();
+                break;
         }
+    }
+}
+[Serializable]
+public struct TalkAppInfo:IDisposable
+{
+    [Serializable]
+    public struct Talk
+    {
+        public Speaker speaker; //화자 (말풍선 방향)
+        public string content; //대화 내용
+        public bool commonroute; //해당값이 true인경우 배열의 끝이 아니여도 선택지를 출현시킨다. 대신 분기가 이루어지지않고 다음대사의 내용만이 바뀐다.
+        public string[] choicelist;
+        public int[] Goindex;
+    }
+    public Talk[] introtalk;
+    public List<Talk[]> choicetalk;
+
+    public void Dispose()
+    {
+        introtalk = null;
+        choicetalk.Clear();
     }
 }
 [Serializable]
