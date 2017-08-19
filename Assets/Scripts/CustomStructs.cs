@@ -39,8 +39,24 @@ public struct CutInfo : IDisposable
     }
 }
 
+[Serializable]
+public struct PlayerSpeech
+{
+    public int imageindex;
+    public string text;
+}
+
 public interface SceneWarp
 {
     void goScene();
 }
 
+public interface AppIcon
+{
+    void Select();
+}
+
+public interface ISpeech
+{
+    void SpeechComplete();
+}

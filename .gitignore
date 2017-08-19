@@ -11,5 +11,5 @@ Assets/Images/
 #업데이트 파일 무시
 *.meta
 *.sln
-
+*.csproj
 
