@@ -126,7 +126,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Editor\CutSceneGearingEditor.cs" />
+    <Compile Include="Assets\Editor\InternetIconEditor.cs" />
+    <Compile Include="Assets\Editor\MessageIconEditor.cs" />
     <Compile Include="Assets\Editor\NormalSceneGearingEditor.cs" />
+    <Compile Include="Assets\Editor\PlayerSpeechScriptEditor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\CustomMaterial\Mask.shader" />

@@ -7,7 +7,7 @@ using UnityEngine;
 public class MessageIcon : MonoBehaviour, AppIcon
 {
     [SerializeField]
-    private MessageAppInfo[] infos;
+    private MessageAppInfo[] infos = new MessageAppInfo[1];
     public void Select()
     {
         GameManager.appinfo = infos[UnityEngine.Random.Range(0, infos.Length)];

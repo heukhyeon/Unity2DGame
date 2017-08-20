@@ -13,11 +13,13 @@
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Unity Subset v3.5</TargetFrameworkProfile>
-    <CompilerResponseFile></CompilerResponseFile>
+    <CompilerResponseFile>
+    </CompilerResponseFile>
     <UnityProjectType>Game:1</UnityProjectType>
     <UnityBuildTarget>Android:13</UnityBuildTarget>
     <UnityVersion>5.6.1f1</UnityVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <LangVersion>4</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -82,10 +84,18 @@
     <Compile Include="Assets\Book-Page Curl\scripts\Book.cs" />
     <Compile Include="Assets\Scripts\CustomStructs.cs" />
     <Compile Include="Assets\Scripts\CutScene.cs" />
-    <Compile Include="Assets\Scripts\CutSceneGearing.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
+    <Compile Include="Assets\Scripts\Internet.cs" />
     <Compile Include="Assets\Scripts\Loading.cs" />
-    <Compile Include="Assets\Scripts\NormalSceneGearing.cs" />
+    <Compile Include="Assets\Scripts\Message.cs" />
+    <Compile Include="Assets\Scripts\SceneGearing\CutSceneGearing.cs" />
+    <Compile Include="Assets\Scripts\SceneGearing\NormalSceneGearing.cs" />
+    <Compile Include="Assets\Scripts\SpeechEvent.cs" />
+    <Compile Include="Assets\Scripts\StageSelect\AppIcon\InternetIcon.cs" />
+    <Compile Include="Assets\Scripts\StageSelect\AppIcon\MessageIcon.cs" />
+    <Compile Include="Assets\Scripts\StageSelect\Pad.cs" />
+    <Compile Include="Assets\Scripts\StageSelect\Player.cs" />
+    <Compile Include="Assets\Scripts\StageSelect\PlayerSpeechScript.cs" />
     <Compile Include="Assets\Scripts\Title.cs" />
   </ItemGroup>
   <ItemGroup>

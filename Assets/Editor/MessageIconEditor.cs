@@ -10,6 +10,7 @@ using System.IO;
 [CustomEditor(typeof(MessageIcon))]
 public class MessageIconEditor : Editor
 {
+    
     SerializedProperty infos;
     List<bool> casefolds = new List<bool>();
     List<string> fulltexts = new List<string>();
