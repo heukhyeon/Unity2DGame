@@ -13,7 +13,7 @@ public class InternetIconEditor:Editor
         public InternetAppInfo info;
         public int index;
         public bool fold;
-        public bool[] elementfold = new bool[5];
+        public bool[] elementfold = new bool[5]; // 정답, 연관 검색어, 사이트, 지식인, 사전
         public bool[] fold_site = new bool[1];
         public bool[] fold_knowins = new bool[1];
         public bool[] fold_encyclopedia = new bool[1];
@@ -25,13 +25,25 @@ public class InternetIconEditor:Editor
     private void OnEnable()
     {
         app = (InternetIcon)target;
+        if (app.infos == null) app.infos = new InternetAppInfo[1];
         PropertyListModify(app.infos.Length);
     }
     public override void OnInspectorGUI()
     {
         int temp = EditorGUILayout.DelayedIntField("케이스 수", app.infos.Length);
-        if (temp != app.infos.Length)PropertyListModify(temp);
+        if (temp != app.infos.Length || app.infos.Length != propertys.Count) PropertyListModify(temp);
         if (temp == 1) AppInfoCreate(propertys[0]);
+        else for (int i = 0; i < app.infos.Length; i++)
+            {
+                propertys[i].fold = EditorGUILayout.Foldout(propertys[i].fold, "케이스" + (i + 1));
+                if (propertys[i].fold)
+                {
+                    EditorGUI.indentLevel++;
+                    AppInfoCreate(propertys[i]);
+                    EditorGUI.indentLevel--;
+                }
+            }
+
     }
     private void PropertyListModify(int size)
     {
@@ -68,7 +80,6 @@ public class InternetIconEditor:Editor
         if (size != array.Length)
         {
             T[] temparray = new T[size];
-            bool[] tempfold = Enumerable.Repeat(true, size).ToArray();
             for (int i = 0; i < array.Length; i++)
             {
                 if (i == temparray.Length) break;
@@ -139,7 +150,7 @@ public class InternetIconEditor:Editor
         property.elementfold[3] = EditorGUILayout.Foldout(property.elementfold[3], "지식인");
         if (!property.elementfold[3]) return;
         EditorGUI.indentLevel++;
-        ArraySizeModify(ref knowins,ref property.fold_knowins, "지식인 질문 수");
+        ArraySizeModify(ref knowins,ref property.fold_knowins, "지식인 질문");
         EditorGUI.indentLevel++;
         for (int i=0;i<knowins.Length;i++)
         {

@@ -82,6 +82,7 @@
   <ItemGroup>
     <Compile Include="Assets\Book-Page Curl\scripts\AutoFlip.cs" />
     <Compile Include="Assets\Book-Page Curl\scripts\Book.cs" />
+    <Compile Include="Assets\Scripts\CrossWordPuzzle.cs" />
     <Compile Include="Assets\Scripts\CustomStructs.cs" />
     <Compile Include="Assets\Scripts\CutScene.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
@@ -91,6 +92,7 @@
     <Compile Include="Assets\Scripts\SceneGearing\CutSceneGearing.cs" />
     <Compile Include="Assets\Scripts\SceneGearing\NormalSceneGearing.cs" />
     <Compile Include="Assets\Scripts\SpeechEvent.cs" />
+    <Compile Include="Assets\Scripts\StageSelect\AppIcon\DictionaryIcon.cs" />
     <Compile Include="Assets\Scripts\StageSelect\AppIcon\InternetIcon.cs" />
     <Compile Include="Assets\Scripts\StageSelect\AppIcon\MessageIcon.cs" />
     <Compile Include="Assets\Scripts\StageSelect\Pad.cs" />

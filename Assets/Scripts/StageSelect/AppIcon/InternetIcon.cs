@@ -3,7 +3,9 @@ using UnityEngine;
 
 public class InternetIcon:MonoBehaviour,AppIcon
 {
-    public InternetAppInfo[] infos;
+    [SerializeField]
+    public InternetAppInfo[] infos = new InternetAppInfo[1];
+
     public void Select()
     {
         GameManager.appinfo = infos[UnityEngine.Random.Range(0, infos.Length)];

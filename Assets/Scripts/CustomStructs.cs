@@ -17,7 +17,7 @@ public struct CutSceneInfo : IDisposable //컷신에 사용될 구조체. 프롤
     }
     public void Dispose()
     {
-        if(cuts!=null)
+        if (cuts != null)
         {
             foreach (CutInfo cut in cuts)
                 cut.Dispose();
