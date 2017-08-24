@@ -8,11 +8,16 @@ public class MessageIcon : MonoBehaviour, AppIcon
 {
     [SerializeField]
     private MessageAppInfo[] infos = new MessageAppInfo[1];
+    public StageSelect stage;
     public void Select()
     {
-        GameManager.appinfo = infos[UnityEngine.Random.Range(0, infos.Length)];
-        GameManager.speech = GetComponent<PlayerSpeechScript>();
-        GetComponent<SceneWarp>().goScene();
+        if(GameManager.prologue.isPlayMessage)
+        {
+            GameManager.appinfo = infos[UnityEngine.Random.Range(0, infos.Length)];
+            GameManager.speech = GetComponent<PlayerSpeechScript>();
+            GetComponent<SceneWarp>().goScene();
+        }
+        else stage.CutStart(StageSelect.PlayCut.Message);
     }
 }
 

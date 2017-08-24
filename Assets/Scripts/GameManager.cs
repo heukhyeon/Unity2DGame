@@ -11,5 +11,6 @@ using System.Text;
     public static CutSceneInfo CutScene;
     public static object appinfo;
     public static PlayerSpeechScript speech;
+    public static PrologueData prologue;
  }
 

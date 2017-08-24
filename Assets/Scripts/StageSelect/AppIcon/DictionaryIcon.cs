@@ -5,8 +5,7 @@ using UnityEngine;
 public class DictionaryIcon:MonoBehaviour,AppIcon
 {
     [SerializeField]
-    public DictionaryAppinfo[] infos = new DictionaryAppinfo[1]; 
-
+    public DictionaryAppinfo[] infos = new DictionaryAppinfo[1];
     public void Select()
     {
         GameManager.appinfo = infos[UnityEngine.Random.Range(0, infos.Length)];
@@ -32,6 +31,7 @@ public class DictionaryAppinfo
     [SerializeField]
     public Quest[] column = new Quest[0];
     [SerializeField]
-    public List<char[]> answers = new List<char[]>();
-
+    public char[,] answers = new char[10, 10];
+    [SerializeField]
+    public int[,] space = new int[10, 10];
 }

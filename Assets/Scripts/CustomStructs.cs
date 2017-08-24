@@ -38,12 +38,17 @@ public struct CutInfo : IDisposable
         fulltext = null;
     }
 }
-
 [Serializable]
 public struct PlayerSpeech
 {
     public int imageindex;
     public string text;
+}
+
+public struct PrologueData
+{
+    public bool isPlayIntro;
+    public bool isPlayMessage;
 }
 
 public interface SceneWarp

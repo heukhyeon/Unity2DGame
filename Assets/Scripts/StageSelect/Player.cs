@@ -79,6 +79,8 @@ public class Player : MonoBehaviour {
                 case "App":
                     if(y_dir==1&&!isSelect)
                     {
+                        x_dir = 0;
+                        y_dir = 0;
                         isSelect = true;
                         hit.transform.GetComponent<AppIcon>().Select();
                     }

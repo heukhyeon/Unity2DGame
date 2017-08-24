@@ -216,7 +216,7 @@ public class InternetIconEditor:Editor
         for(int i=0;i<array.Length;i++)
         {
             if (i == array.Length - 1) sb.Append(array[i]);
-            else sb.AppendFormat("{0}",array[i]);
+            else sb.AppendFormat("{0},",array[i]);
         }
         fulltext = sb.ToString();
     }
