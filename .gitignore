@@ -9,6 +9,8 @@ Assets/CustomMaterial/
 Assets/TempImage/
 Assets/Fonts/
 Assets/Images/
+Assets/Prefabs/
+Assets/Scenes/
 #업데이트 파일 무시
 *.meta
 *.sln

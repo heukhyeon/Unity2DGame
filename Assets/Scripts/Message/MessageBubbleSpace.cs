@@ -6,9 +6,9 @@ public class MessageBubbleSpace : MessageScene.Space
 {
     public bool enable = false;
     Dictionary<string, bool> speech = new Dictionary<string, bool>();
-    public void Init(Message message)
+    public void Init(Message.MessageInfo[] infos)
     {
-        foreach (var info in message.items) speech.Add(info.content, info.speaker);
+        foreach (var info in infos) speech.Add(info.content, info.speaker);
     }
     public void MessageEnter()
     {
@@ -21,13 +21,13 @@ public class MessageBubbleSpace : MessageScene.Space
     public override void Create(string text)
     {
         bool isHero = speech[text];
-        Vector2 pos = new Vector2(isHero == true ? 95 : -95, items.Count * -260);
+        Vector2 pos = new Vector2(isHero == true ? 95 : -95, items.Count * -260-115);
         RectTransform target = SmartPhone.CreateAndPosition(originItem, space, pos);
         if (!isHero) target.rotation = Quaternion.Euler(0, 180, 0);
         Text speechcom = target.GetComponentInChildren<Text>();
         speechcom.transform.rotation = Quaternion.identity;
         speechcom.text = text;
-        target.GetComponent<Button>().onClick.AddListener(() => { MessageRemove(target); });
+        target.GetComponentInChildren<Button>().onClick.AddListener(() => { MessageRemove(target); });
         items.Add(target);
         scene.clickenable = true;
         space.sizeDelta = new Vector2(space.sizeDelta.x, items.Count * 300);
@@ -46,7 +46,7 @@ public class MessageBubbleSpace : MessageScene.Space
         for (int i = 0; i < items.Count; i++)
         {
             Vector2 pos = items[i].localPosition;
-            pos.y = i * -260;
+            pos.y = i * -260 - 115;
             items[i].localPosition = pos;
         }
     }

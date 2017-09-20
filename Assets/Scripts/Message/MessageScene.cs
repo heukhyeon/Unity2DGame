@@ -1,11 +1,10 @@
-﻿using commonStage;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class MessageScene : Stage,IClickDelay
+public class MessageScene : Stage,IBeforeClear,IClickDelay,INormalButton
 {
     public abstract class Space:MonoBehaviour
     {
@@ -21,26 +20,29 @@ public class MessageScene : Stage,IClickDelay
     }
     public MessageBlockSpace blockspace;
     public MessageBubbleSpace bubblespace;
+    [SerializeField]
+    Message.MessageInfo[] info = new Message.MessageInfo[0];
     string[] answers;
     public Image background;
-    public override Action BeforeIntro
+    protected override Action BeforeIntro
     {
         get
         {
             return () =>
             {
                 background = bubblespace.transform.parent.GetComponent<Image>();
-                Message message = SmartPhone.GetData<Message>();
-                bubblespace.Init(message);
-                answers = new string[message.items.Length];
-                for (int i = 0; i < answers.Length; i++) answers[i] = message.items[i].content;
-                var infos = InfoShuffle(message.items);
+                blockspace.scene = this;
+                bubblespace.scene = this;
+                bubblespace.Init(info);
+                answers = new string[info.Length];
+                for (int i = 0; i < answers.Length; i++) answers[i] = info[i].content;
+                var infos = InfoShuffle(info);
                 for (int i = 0; i < infos.Length; i++) blockspace.Create(infos[i].content);
                 for (int i = 0; i < infos.Length; i++) blockspace.items[i].gameObject.SetActive(false);
             };
         }
     }
-    public override IEnumerator AfterIntro {
+    protected override IEnumerator AfterIntro {
         get
         {
             foreach(var block in blockspace.items)
@@ -49,11 +51,11 @@ public class MessageScene : Stage,IClickDelay
                 iTween.ShakeScale(block.gameObject, new Vector2(5, 5), 2f);
                 yield return new WaitForSeconds(0.5f);
             }
+            clickenable = true;
         }
     }
-    public override MissionType missiontype { get { return MissionType.Count; } }
     public override int MaxLife{get { return 3; }}
-    public override bool Answer {
+    public bool Answer {
         get
         {
             Text[] nowbubbles = bubblespace.GetMessage();
@@ -66,9 +68,26 @@ public class MessageScene : Stage,IClickDelay
             return true;
         }
     }
+    public override MissionType missontype
+    {
+        get { return MissionType.Count; }
+    }
     public override int WestedLifeClear { get { return 3; } }
-    public override int WestedLifeGameover { get { return 5; } }
+    public override int WestedLifeGameOver { get { return 5; } }
     public bool clickenable { get; set; }
+    public IEnumerator BeforeClear
+    {
+        get
+        {
+            while(true)
+            {
+                if(blockspace.transform.localScale.x>0) SmartPhone.SizeSet(blockspace, -Time.deltaTime, 0);
+                if (bubblespace.transform.localScale.x > 0)  SmartPhone.SizeSet(bubblespace, -Time.deltaTime, 0);
+                if (blockspace.transform.localScale.x == 0 && bubblespace.transform.localScale.x == 0) break;
+                else yield return new WaitForEndOfFrame();
+            }
+        }
+    }
 }
 
 

@@ -24,6 +24,7 @@ public class MessageBlockSpace : MessageScene.Space
         target.sizeDelta = new Vector2(250, 250);
         items.Add(target);
         space.sizeDelta = new Vector2(1000, (items.Count / 3) * 600);
+        scene.Submitenable = false;
     }
     public override void ItemSort()
     {
@@ -53,6 +54,7 @@ public class MessageBlockSpace : MessageScene.Space
             selectBlock = null;
             space.sizeDelta = new Vector2(1000, (items.Count / 3) * 600);
             ItemSort();
+            if (items.Count == 0) scene.Submitenable = true;
         }
         else
         {
