@@ -14,7 +14,7 @@ public class CrossWordBlock : MonoBehaviour {
     public void Setting(DictionaryScene scene,List<CrossWordBlock>list, DictionaryScene.CrossWordBlockInfo info)
     {
         field = GetComponent<InputField>();
-        Transform num = transform.Find("NumFiled");
+        Transform num = transform.Find("NumField");
         if (info.index== 0) Destroy(num.gameObject); //숫자가 0임 = 인덱스 표시 블록이 아님
         else
         {
@@ -31,8 +31,10 @@ public class CrossWordBlock : MonoBehaviour {
         if (isEnable)
         {
             field.onValueChanged.AddListener((data) => { ValueChange(); });
-            GetComponent<EventTrigger>().triggers[0].callback.AddListener((data) => { scene.ShowHint(info.hint); });
-            field.text = Answer;
+            EventTrigger.Entry trigger = new EventTrigger.Entry();
+            trigger.eventID = EventTriggerType.Select;
+            trigger.callback.AddListener((data) => { scene.ShowHint(info.hint); });
+            GetComponent<EventTrigger>().triggers.Add(trigger);
         }
         else Destroy(GetComponent<EventTrigger>());
         list.Remove(this);//다시 이 블록을 호출하지않도록 리스트에서 자신을 제거

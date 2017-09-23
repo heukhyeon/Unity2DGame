@@ -36,6 +36,7 @@ public class DictionaryScene : Stage,IBeforeClear,INormalButton
         get
         {
             CrossWord info = SmartPhone.GetData<CrossWord>();
+            Debug.Log(info.Row.Length);
             List<CrossWordBlock> temp = blocklist.ToList();
             CrossWordBlockInfo[,] infos = new CrossWordBlockInfo[10, 10];
             foreach (var word in info.Row)

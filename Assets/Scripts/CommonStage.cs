@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-    public enum MissionType { Count,Timer}
+public enum MissionType { Count,Timer}
 public delegate void VoidDelegate();
 public abstract class Stage : MonoBehaviour
 {
@@ -28,7 +28,8 @@ public abstract class Stage : MonoBehaviour
     {
         BeforeIntro();
         IDisableButton notbutton = GetComponent<IDisableButton>();
-        if(notbutton==null)
+        IBeforeClear before = GetComponent<IBeforeClear>();
+        if (notbutton==null)
         {
             IClickDelay delay = GetComponent<IClickDelay>();
             ICustomButton button = GetComponent<ICustomButton>();
@@ -37,20 +38,19 @@ public abstract class Stage : MonoBehaviour
                 INormalButton normal = GetComponent<INormalButton>();
                 Action action = new Action(() =>
                 {
-                    if (normal.Answer)
+                if (normal.Answer)
+                {
+                    List<IEnumerator> actions = new List<IEnumerator>();
+                    IAfterClear after = GetComponent<IAfterClear>();
+                    IEnumerator last;
+                    if (before != null) actions.Add(before.BeforeClear);
+                    if (after != null)
                     {
-                        List<IEnumerator> actions = new List<IEnumerator>();
-                        IBeforeClear before = GetComponent<IBeforeClear>();
-                        IAfterClear after = GetComponent<IAfterClear>();
-                        IEnumerator last;
-                        if (before != null) actions.Add(before.BeforeClear);
-                        if (after != null)
-                        {
-                            last = after.AfterClear;
-                            actions.Add(lifeSystem.NormalClear);
-                        }
-                        else last = lifeSystem.NormalClear;
-                        actions.Add(CorutineAction(last, ReturnMain));
+                        last = after.AfterClear;
+                        actions.Add(lifeSystem.NormalClear);
+                    }
+                    else last = lifeSystem.NormalClear;
+                    actions.Add(CorutineAction(last, () => { Invoke("ReturnMain", 1.5f); }));
                         CombineCorutine(actions);
                     }
                     else StartCoroutine(lifeSystem.FailEvent);
@@ -73,7 +73,10 @@ public abstract class Stage : MonoBehaviour
         {
             Destroy(lifeSystem.lifeUI.submit.gameObject);
             lifeSystem.lifeUI.submit = null;
-            notbutton.ClearEvent += new VoidDelegate(() => { StartCoroutine(CorutineAction(lifeSystem.NormalClear, ReturnMain)); });
+            List<IEnumerator> clearlist = new List<IEnumerator>();
+            if (before != null) clearlist.Add(before.BeforeClear);
+            clearlist.Add(CorutineAction(lifeSystem.NormalClear, ReturnMain));
+            notbutton.ClearEvent += new VoidDelegate(() => { CombineCorutine(clearlist); });
             notbutton.FailEvent += new VoidDelegate(() => { StartCoroutine(lifeSystem.FailEvent); });
         }
         CombineCorutine(new IEnumerator[] { lifeSystem.IntroEvent,CorutineAction(AfterIntro,lifeSystem.GameStart) });
@@ -91,7 +94,7 @@ public abstract class Stage : MonoBehaviour
     }
     protected void ReturnMain()
     {
-
+        SmartPhone.LoadStage(SmartPhone.MainStage);
     }
     void CombineCorutine(List<IEnumerator>corutines)
     {

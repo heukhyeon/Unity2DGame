@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
-public class InternetScene : Stage,INormalButton
+public class InternetScene : Stage,INormalButton,IBeforeClear
 {
     [Serializable]
     private struct InternetBlock
@@ -16,8 +16,10 @@ public class InternetScene : Stage,INormalButton
         RectTransform Header;
         [SerializeField]
         GameObject Origin;
+        public bool Enable { get; private set; }
         public float Prepare<T>(T[] info,float headerpos, Vector2 blockpos,Func<RectTransform,T,float>func)
         {
+            Enable = info.Length != 0;
             if (info.Length == 0)
             {
                 Destroy(Header.gameObject);
@@ -40,20 +42,36 @@ public class InternetScene : Stage,INormalButton
             return block.Header;
         }
     }
+    [Serializable]
+    private struct RollingBlock
+    {
+        public Transform block;
+        public Transform parent;
+        public int dir;
+        public IEnumerator RollingThrow(params float[] y_val)
+        {
+            float y_dir = 10;
+            if (y_val.Length > 0) y_dir += y_val[0];
+            float cnt = 0;
+            float rot_dir = dir == 0 ? 1 : dir;
+            block.SetParent(parent);
+            while(cnt<10)
+            {
+                Vector3 pos = block.position;
+                pos.x += dir * 5;
+                pos.y += y_dir;
+                y_dir -= 30 * Time.deltaTime;
+                block.position = pos;
+                pos = block.rotation.eulerAngles;
+                pos.z += rot_dir * 30;
+                block.rotation = Quaternion.Euler(pos);
+                cnt += Time.deltaTime;
+                yield return new WaitForEndOfFrame();
+            }
+        }
+    }
     List<string> answers = new List<string>();
 
-#region 임시 필드 지정
-    [SerializeField]
-    Internet.SiteInfo[] sites;
-    [SerializeField]
-    Internet.KnowInInfo[] knowins;
-    [SerializeField]
-    Internet.WikiInfo[] wikis;
-    [SerializeField]
-    string InternetAnswer;
-    [SerializeField]
-    string Relations;
-#endregion
     [SerializeField]
     InternetBlock site;
     [SerializeField]
@@ -124,7 +142,8 @@ public class InternetScene : Stage,INormalButton
             return () =>
             {
                 string temp = "";
-                foreach (char c in InternetAnswer)
+                Internet info = SmartPhone.GetData<Internet>();
+                foreach (char c in info.Answer)
                 {
                     if (c == ',')
                     {
@@ -135,12 +154,12 @@ public class InternetScene : Stage,INormalButton
                 }
                 answers.Add(temp);
                 Text relations = Relation.GetComponentsInChildren<Text>()[1];
-                relations.text = Relations;
+                relations.text = info.Relation;
                 Relation.gameObject.SetActive(false);
                 float pos = -(Relation.sizeDelta.y + 70);
-                pos += site.Prepare(sites, pos, new Vector2(0, -65), SiteSetting);
-                pos += knowin.Prepare(knowins, pos, new Vector2(0, -65), KnowinSetting);
-                pos += wiki.Prepare(wikis, pos, new Vector2(0, -60), WikiSetting);
+                pos += site.Prepare(info.site, pos, new Vector2(0, -65), SiteSetting);
+                pos += knowin.Prepare(info.knowin, pos, new Vector2(0, -65), KnowinSetting);
+                pos += wiki.Prepare(info.wiki, pos, new Vector2(0, -60), WikiSetting);
                 Content.sizeDelta = new Vector2(990, -pos);
             };
         }
@@ -151,9 +170,9 @@ public class InternetScene : Stage,INormalButton
         {
             List<RectTransform> blocks = new List<RectTransform>();
             blocks.Add(Relation);
-            if (sites.Length > 0) blocks.Add(site);
-            if (knowins.Length > 0) blocks.Add(knowin);
-            if (wikis.Length > 0) blocks.Add(wiki);
+            if (site.Enable) blocks.Add(site);
+            if (knowin.Enable) blocks.Add(knowin);
+            if (wiki.Enable) blocks.Add(wiki);
             foreach (RectTransform item in blocks)
             {
                 Vector2 pivot = new Vector2(0.5f, 0.5f);
@@ -181,6 +200,8 @@ public class InternetScene : Stage,INormalButton
                 }
             }
             AnswerField.interactable = true;
+            AnswerField.text = answers[0];
+
         }
     }
     public override MissionType missontype { get { return MissionType.Count; } }
@@ -188,6 +209,50 @@ public class InternetScene : Stage,INormalButton
     public bool Answer { get { string text = AnswerField.text; foreach (string answer in answers) if (text == answer) return true; return false; } }
     public override int WestedLifeClear { get { return 3; } }
     public override int WestedLifeGameOver { get { return 5; } }
+
+    public IEnumerator BeforeClear
+    {
+        get
+        {
+            List<Transform> blocks = new List<Transform>();
+            if (Relation != null) blocks.Add(Relation);
+            if (site.Enable) blocks.Add(site);
+            if (knowin.Enable) blocks.Add(knowin);
+            if (wiki.Enable) blocks.Add(wiki);
+            Transform scroll = Relation.parent.parent;
+            float speed = 20f;
+            int dir = -1;
+            while(blocks.Count>0)
+            {
+                if(blocks[0].position.y<1300)
+                {
+                    foreach(var block in blocks)
+                    {
+                        Vector2 pos = block.position;
+                        pos.y += speed;
+                        block.position = pos;
+                    }
+                    yield return new WaitForEndOfFrame();
+                }
+                else
+                {
+                    RollingBlock rolling = new RollingBlock();
+                    rolling.block = blocks[0];
+                    rolling.dir = dir;
+                    rolling.parent = this.transform;
+                    dir *= -1;
+                    blocks.RemoveAt(0);
+                    StartCoroutine(rolling.RollingThrow());
+                }
+            }
+            RollingBlock rolling2 = new RollingBlock();
+            rolling2.block = scroll;
+            rolling2.dir = 0;
+            rolling2.parent = this.transform;
+            StartCoroutine(rolling2.RollingThrow(20f));
+            yield return new WaitForSeconds(1.5f);
+        }
+    }
 }
 
 

@@ -207,6 +207,8 @@ public class LifeSystem : MonoBehaviour
     {
         get
         {
+            CancelInvoke();
+            if (lifeUI.submit != null) lifeUI.submit.interactable = false;
             Color color = notice.ClearColor;
             color.a = 0.2f;
             notice.ClearColor = color;
@@ -304,6 +306,7 @@ public class LifeSystem : MonoBehaviour
                 lifeUI.Frame.color = lifeUI.Frame.color == Color.red ? Color.white : Color.red;
                 yield return new WaitForSeconds(0.1f);
             }
+            if (life == 0) yield return StartCoroutine(GameOver);
         }
     }
     public Action GameStart
@@ -327,11 +330,23 @@ public class LifeSystem : MonoBehaviour
             };
         }
     }
+    IEnumerator GameOver
+    {
+        get
+        {
+            if (lifeUI.submit != null) lifeUI.submit.interactable = false;
+            Transform[] trs = this.transform.root.GetComponentsInChildren<Transform>();
+            foreach (var tr in trs) iTween.ShakePosition(tr.gameObject, new Vector3(100, 100, 0), 2f);
+            yield return new WaitForSeconds(1.5f);
+            SmartPhone.LoadStage("StageSelect");
+        }
+    }
     void Timer()
     {
         life--;
         lifeUI.Value= new Vector2(step * life, 120);
         lifeUI.Notice = NowTime;
-        Invoke("Timer", 1f);
+        if (life > 0) Invoke("Timer", 1f);
+        else StartCoroutine(GameOver);
     }
 }

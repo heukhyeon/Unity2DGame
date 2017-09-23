@@ -86,6 +86,7 @@ public class MessageScene : Stage,IBeforeClear,IClickDelay,INormalButton
                 if (blockspace.transform.localScale.x == 0 && bubblespace.transform.localScale.x == 0) break;
                 else yield return new WaitForEndOfFrame();
             }
+            SmartPhone.memory.Message = StageMemory.Status.PerfectClear;
         }
     }
 }

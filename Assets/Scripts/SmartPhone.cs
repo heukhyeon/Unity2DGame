@@ -12,30 +12,22 @@ public static class SmartPhone
 {
     public static bool LoadigSkip;
     public static string NextScene { get; private set; }
+    public const string MainStage = "StageSelect";
+    public static StageMemory memory;
     public static T GetData<T>() where T:Component
     {
         T ret = (Resources.Load("SaveData") as GameObject).GetComponent<T>();
         return ret;
     }
-    /*
     public static void LoadStage(string name)
     {
-        LoadigSkip = GetData<Common>().LoadingSkip;
-        if(name.Equals(SceneManager.GetActiveScene().name))
-        {
-            Debug.Log("같은 씬입니다");
-            return;
-        }
-        else
-        {
             if (LoadigSkip) SceneManager.LoadScene(name);
             else
             {
                 NextScene = name;
                 SceneManager.LoadScene("Loading");
             }
-        }
-    }*/
+    }
     public static RectTransform CreateAndPosition(GameObject obj, RectTransform parent, Vector2 pos)
     {
         GameObject target = UnityEngine.Object.Instantiate(obj, parent, false);
@@ -70,4 +62,10 @@ public static class SmartPhone
     }
 }
 
+public struct StageMemory
+{
+    public enum Status { NotEnter,NotClear,Clear,PerfectClear}
+    public Status Message { get; set; }
+    public Status Internet { get; set; }
+}
 
