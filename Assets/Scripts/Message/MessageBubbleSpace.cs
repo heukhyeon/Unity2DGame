@@ -5,15 +5,19 @@ using UnityEngine.UI;
 public class MessageBubbleSpace : MessageScene.Space
 {
     public bool enable = false;
-    Dictionary<string, bool> speech = new Dictionary<string, bool>();
+    Dictionary<string, bool> speech = new Dictionary<string, bool>(); //말풍선의 방향을 판정하기위한 Dictionary
+    AudioSource au;
     public void Init(Message.MessageInfo[] infos)
     {
-        foreach (var info in infos) speech.Add(info.content, info.speaker);
+        au = GetComponent<AudioSource>();
+        foreach (var info in infos) speech.Add(info.content, info.speaker);//전달받은 정보에 따라 Dictionary에 항목 추가
     }
+    //해당 객체 구역에 진입시
     public void MessageEnter()
     {
         enable = true;
     }
+    //해당 객체 구역을 벗어낫을시.
     public void MessageExit()
     {
         enable = false;
@@ -21,6 +25,7 @@ public class MessageBubbleSpace : MessageScene.Space
     public override void Create(string text)
     {
         bool isHero = speech[text];
+        au.PlayOneShot(scene.kwang);
         Vector2 pos = new Vector2(isHero == true ? 95 : -95, items.Count * -260-115);
         RectTransform target = SmartPhone.CreateAndPosition(originItem, space, pos);
         if (!isHero) target.rotation = Quaternion.Euler(0, 180, 0);
@@ -32,6 +37,7 @@ public class MessageBubbleSpace : MessageScene.Space
         scene.clickenable = true;
         space.sizeDelta = new Vector2(space.sizeDelta.x, items.Count * 300);
     }
+    //말풍선을 클릭한경우, 말풍선을 블록으로 변환.
     void MessageRemove(RectTransform target)
     {
         string text = target.GetComponentInChildren<Text>().text;
@@ -41,6 +47,7 @@ public class MessageBubbleSpace : MessageScene.Space
         space.sizeDelta = new Vector2(space.sizeDelta.x, items.Count * 300);
         ItemSort();
     }
+    //말풍선 제거에 따른 말풍선 재정렬
     public override void ItemSort()
     {
         for (int i = 0; i < items.Count; i++)
@@ -50,6 +57,7 @@ public class MessageBubbleSpace : MessageScene.Space
             items[i].localPosition = pos;
         }
     }
+    //Answer에서 현재 메세지 목록을 요구하므로 현재 말풍선 내용들을 반환.
     public Text[] GetMessage()
     {
         return space.GetComponentsInChildren<Text>();

@@ -13,6 +13,7 @@ public class Loading : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        //중복 스테이지 호출 방지
         if (!isLoading)
         {
             size = value.sizeDelta;
@@ -25,10 +26,12 @@ public class Loading : MonoBehaviour
     IEnumerator LoadingAsync()
     {
         AsyncOperation async;
+        //다음 씬을 동기화해서 불러옴.
         async = SceneManager.LoadSceneAsync(SmartPhone.NextScene);
-        async.allowSceneActivation = false;
+        async.allowSceneActivation = false;//로딩 완료시 바로 가지 않게끔 함.
         float delay = 0;
         float step = (1000 / LoadingDelay) * Time.deltaTime;
+        //로딩이 완료됬고, 로딩바가 완전히 찰때까지 반복.
         while (!(async.isDone&&size.x>1000))
         {
             if (async.allowSceneActivation == false && delay >= LoadingDelay) async.allowSceneActivation = true;

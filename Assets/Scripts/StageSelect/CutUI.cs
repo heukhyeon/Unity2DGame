@@ -1,4 +1,5 @@
-﻿using System;
+﻿#pragma warning disable 0649
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,6 +12,10 @@ public class CutUI : MonoBehaviour {
     GameObject TutorialLadder;
     [SerializeField]
     Canvas PlayUI;
+    [SerializeField]
+    AudioSource au;
+    [SerializeField]
+    AudioClip defaultsound;
     Canvas cutUI;
     Vector2 DEFAULT_CUTLEFT { get { return new Vector2(-920, 0); } }
     Vector2 THROW_CUTLEFTSIZE { get { return new Vector2(20, 20); } }
@@ -21,8 +26,9 @@ public class CutUI : MonoBehaviour {
     private struct CutInfo
     {
         public Sprite image;
-        public CutEffect effect_left;
-        public CutEffect effect_right;
+        public AudioClip sound; //null이 아닌경우 현재 컷이 나올때 음악이 출력됨.
+        public CutEffect effect_left; //왼쪽->중앙으로 올때의 이펙트
+        public CutEffect effect_right;//중앙->퇴장할때 이펙트
     }
     [SerializeField]
     CutInfo[] Intro;
@@ -49,15 +55,18 @@ public class CutUI : MonoBehaviour {
     }
     void Judge()
     {
-       bool FirstCut =  SmartPhone.memory.Message == StageMemory.Status.NotEnter;
-       bool ThirdCut = SmartPhone.memory.Message == StageMemory.Status.PerfectClear && SmartPhone.memory.Internet == StageMemory.Status.NotEnter;
-        TutorialLadder.SetActive(!(FirstCut || ThirdCut));
+       bool FirstCut =  SmartPhone.memory.Message == StageMemory.Status.NotEnter; //메인스테이지에 처음 진입한경우
+       bool ThirdCut = SmartPhone.memory.Message == StageMemory.Status.PerfectClear && SmartPhone.memory.Internet == StageMemory.Status.NotEnter; //메세지를 깨고 아직 인터넷을 진입하지않은경우
+        TutorialLadder.SetActive(!(FirstCut || ThirdCut)); //메세지, 인터넷을 모두 클리어한경우 사다리 개방.
         if (FirstCut) Nowcut = Intro;
         else if (ThirdCut) Nowcut = MessageExit;
+        //재생할 컷이 존재하는경우 PlayUI 비활성.
         if (Nowcut != null)
         {
             PlayUI.enabled = false;
+            au.clip = Nowcut[0].sound; 
             StartCoroutine(CutEvent_Left);
+            au.Play();
         }
         else EventEnd();
     }
@@ -148,10 +157,13 @@ public class CutUI : MonoBehaviour {
             else EventEnd();
         }
     }
+    //Player가 앱 진입시 컷씬을 재생하는경우 호출.
     public void CutStart(string stage)
     {
         if (stage == "Message") Nowcut = MessageEnter;
         else if (stage == "Internet") Nowcut = InternetEnter;
+        au.clip = Nowcut[0].sound;
+        au.Play();
         index = 0;
         PlayUI.enabled = false;
         cutUI.enabled = true;
@@ -159,23 +171,30 @@ public class CutUI : MonoBehaviour {
     }
     public void Click()
     {
-        if (!clickenable) return;
-        clickenable = false;
+        if (!clickenable) return;//아직 컷이 이동중인경우 리턴.
+        clickenable = false;//컷이 이동시작
+        //현재 이동방향에 따른 역방향으로 재생.
         if (dir_left) StartCoroutine(CutEvent_Right);
         else StartCoroutine(CutEvent_Left);
     }
+    //컷씬 재생이 끝난경우
     void EventEnd()
     {
+        //다음 씬 이동이 없는경우
         if (Nowcut == Intro || Nowcut == MessageExit || Nowcut==null)
         {
             cutUI.enabled = false;
             PlayUI.enabled = true;
+            au.clip = defaultsound;
+            au.Play();
         }
+        //메세지 진입
         else if (Nowcut == MessageEnter)
         {
             SmartPhone.memory.Message = StageMemory.Status.NotClear;
             SmartPhone.LoadStage("Message");
         }
+        //인터넷 진입
         else if (Nowcut == InternetEnter)
         {
             SmartPhone.memory.Internet = StageMemory.Status.NotClear;

@@ -7,13 +7,16 @@ using UnityEngine.EventSystems;
 public class CrossWordBlock : MonoBehaviour {
     string Answer;
     InputField field;
+    AudioSource au;
     public int X { get { return transform.GetSiblingIndex() % 10; } }
     public int Y { get { return transform.GetSiblingIndex() / 10; } }
-    public bool Judge { get { if (!field.text.Equals(Answer)) Debug.Log(Y + "," + X +"\n"+"입력글자"+field.text+"\n정답:"+Answer);  return field.text.Equals(Answer); } }
+    //현재 입력값이 최초 입력된 정답과 같은지를 반환.
+    public bool Judge { get { return field.text.Equals(Answer); } }
     public bool isEnable;
     public void Setting(DictionaryScene scene,List<CrossWordBlock>list, DictionaryScene.CrossWordBlockInfo info)
     {
         field = GetComponent<InputField>();
+        au = gameObject.AddComponent<AudioSource>();
         Transform num = transform.Find("NumField");
         if (info.index== 0) Destroy(num.gameObject); //숫자가 0임 = 인덱스 표시 블록이 아님
         else
@@ -33,12 +36,13 @@ public class CrossWordBlock : MonoBehaviour {
             field.onValueChanged.AddListener((data) => { ValueChange(); });
             EventTrigger.Entry trigger = new EventTrigger.Entry();
             trigger.eventID = EventTriggerType.Select;
-            trigger.callback.AddListener((data) => { scene.ShowHint(info.hint); });
+            trigger.callback.AddListener((data) => { au.PlayOneShot(info.effect); scene.ShowHint(info.hint); });
             GetComponent<EventTrigger>().triggers.Add(trigger);
         }
         else Destroy(GetComponent<EventTrigger>());
         list.Remove(this);//다시 이 블록을 호출하지않도록 리스트에서 자신을 제거
         gameObject.SetActive(true);//블록을 렌더링함
+        au.PlayOneShot(info.effect);
     }
     public void ValueChange()
     {

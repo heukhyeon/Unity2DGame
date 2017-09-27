@@ -64,14 +64,14 @@ public class CalculatorScene : Stage, IDisableButton,IBeforeClear
             questionspace.Solution = String.Format("{0:#,###}", ret);
         }
     }
+    //입력 버튼 클릭시
     public void Submit()
     {
         StringBuilder sb = new StringBuilder();
         int num = int.Parse(nowvalue);
-        if (num != questionspace.Answers[problemcnt]) FailEvent();
-        problemcnt++;
-        if (problemcnt < questionspace.ProblemArray.Length) questionspace.QuestionSet(problemcnt);
-        else ClearEvent();
+        if (num != questionspace.Answers[problemcnt]) FailEvent(); //현재 입력값이 현재 정답과 다른경우 일단 틀렸다는 이벤트 재생
+        problemcnt++;//문제 인덱스 증가
+        if (problemcnt < questionspace.ProblemArray.Length) questionspace.QuestionSet(problemcnt); //아직 문제가 남은경우 다음 문제로
+        else ClearEvent();//문제가 더이상 없는경우 클리어 이벤트.
     }
-
 }

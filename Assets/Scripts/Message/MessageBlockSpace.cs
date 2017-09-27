@@ -2,10 +2,12 @@
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
+//메세지 블록이 모여있는 공간.
 public class MessageBlockSpace : MessageScene.Space
 {
     RectTransform selectBlock;
     Vector2 backUpPos;
+    //블록 생성
     public override void Create(string text)
     {
         Vector2 pos = new Vector2((items.Count % 3) * 300, -(items.Count / 3) * 300) + new Vector2(-330, -200);
@@ -26,11 +28,13 @@ public class MessageBlockSpace : MessageScene.Space
         space.sizeDelta = new Vector2(1000, (items.Count / 3) * 600);
         scene.Submitenable = false;
     }
+    //블록 제거에 따른 블록 재정렬
     public override void ItemSort()
     {
         for (int i = 0; i < items.Count; i++)
             items[i].transform.localPosition = new Vector2((i % 3) * 300, -(i / 3) * 300) + new Vector2(-330, -200);
     }
+    //블록 클릭시 호출
     void BlockClick(RectTransform block)
     {
         selectBlock = block;
@@ -38,10 +42,12 @@ public class MessageBlockSpace : MessageScene.Space
         selectBlock.SetParent(scene.transform);
         selectBlock.SetSiblingIndex(1);
     }
+    //블록을 움직일시 호출
     void BlockMove(PointerEventData data)
     {
         selectBlock.position = data.position;
     }
+    //블록을 놓았을때, BubbleSpace 내부인경우 말풍선을 만들고, 아닌경우 선택되었던 블록을 원래 위치로 돌린다.
     void BlockDrop()
     {
         if (scene.bubblespace.enable)

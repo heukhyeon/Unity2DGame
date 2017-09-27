@@ -11,6 +11,7 @@ public class Cut : MonoBehaviour
     {
         public Texture sprite;
         public string content;
+        public AudioClip sound;
     }
     public CutInfo[] cuts = new CutInfo[0];
 }

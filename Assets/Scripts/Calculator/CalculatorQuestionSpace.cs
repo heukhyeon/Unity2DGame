@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
+//문제창, 정답창에 대응.
 public class CalculatorQuestionSpace : MonoBehaviour
 {
     [SerializeField]

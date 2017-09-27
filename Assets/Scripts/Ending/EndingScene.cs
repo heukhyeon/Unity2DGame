@@ -7,71 +7,43 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class CutScene:MonoBehaviour
+public class EndingScene : MonoBehaviour
 {
     [SerializeField]
     RawImage now;
     [SerializeField]
     RawImage next;
-    [SerializeField]
-    GameObject TextField;
-    [SerializeField]
-    AudioSource au;
+    Ending.CutInfo[] cutinfo;
     AudioSource effect;
-    Text speech;
-    Cut.CutInfo[] cutinfo;
     int index = 0;
     bool input = false;
     private void Start()
     {
         effect = GetComponent<AudioSource>();
-        speech = TextField.GetComponentInChildren<Text>();
-        cutinfo = SmartPhone.GetCut().cuts;
-        now.texture = cutinfo[0].sprite;
-        au.clip = cutinfo[0].sound;
-        au.Play();
-        StartCoroutine("Print");
+        cutinfo = SmartPhone.GetData<Ending>().infos;
+        now.texture = cutinfo[0].image;
     }
     private void Update()
     {
-       if(Input.anyKeyDown)
+        if (Input.anyKeyDown)
         {
             if (input && index < cutinfo.Length - 1) StartCoroutine(ImageShow());
-            else if (input)SmartPhone.LoadStage(SmartPhone.memory.ClearCheck==true?"Title":"StageSelect");
+            else if (input) Application.Quit();
             else input = true;
         }
-    }
-    IEnumerator Print()
-    {
-        input = false;
-        speech.text = null;
-        for(int i=0;i<cutinfo[index].content.Length;i++)
-        {
-            if(input)
-            {
-                speech.text = cutinfo[index].content;
-                break;
-            }
-            else speech.text += cutinfo[index].content[i];
-            yield return new WaitForEndOfFrame();
-        }
-        input = true;
     }
     IEnumerator ImageShow()
     {
         effect.Play();
-        StopCoroutine("Print");
-        TextField.SetActive(false);
         index++;
-        if (cutinfo[index].sound != null) au.Stop();
-        next.texture = cutinfo[index].sprite;
+        next.texture = cutinfo[index].image;
         Vector2 backup = next.transform.position;
         StartCoroutine(Routine1());
         yield return StartCoroutine(Routine2());
         RectTransform NextTr = next.rectTransform;
         Vector2 scale = NextTr.localScale;
         float speed = Time.deltaTime;
-        while(scale.x<1)
+        while (scale.x < 1)
         {
             scale.x += speed;
             scale.y += speed;
@@ -84,13 +56,6 @@ public class CutScene:MonoBehaviour
         next = temp;
         next.transform.position = backup;
         next.transform.localScale = new Vector2(0.9f, 0.9f);
-        if(cutinfo[index].sound!=null)
-        {
-            au.clip = cutinfo[index].sound;
-            au.Play();
-        }
-        StartCoroutine("Print");
-        TextField.SetActive(true);
     }
     IEnumerator Routine1()
     {
@@ -120,3 +85,4 @@ public class CutScene:MonoBehaviour
         }
     }
 }
+

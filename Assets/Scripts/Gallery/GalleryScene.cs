@@ -7,18 +7,20 @@ using UnityEngine.UI;
 
 public class GalleryScene : Stage, IDisableButton, IClickDelay
 {
+    //퍼즐 공간을 관리한다.(Click과 이동효과는 GalleryScene에서 관리)
     [Serializable]
     private struct GalleryPuzzle
     {
         [SerializeField]
-        GameObject block;
-        public GameObject line;
-        public RectTransform start;
-        public Image complete;
+        GameObject block; //복제할 블록
+        public GameObject line; //복제할 선
+        public RectTransform start;//시작할 위치
+        public Image complete;//완성된 이미지를 보여줄 컴포넌트
         GalleryScene scene;
-        public Transform Empty;
+        public Transform Empty;//현재 비어있는(다른 블록이 이동가능한)블록
         [Range(1, 50)]
-        public float speed;
+        public float speed; //이동 속도
+        //에디터에서 설정한 퍼즐수에 맞게 적당히 퍼즐을 배치.
         public void Create(GalleryScene scen)
         {
             this.scene = scen;
@@ -42,6 +44,7 @@ public class GalleryScene : Stage, IDisableButton, IClickDelay
                 }
             }
         }
+        //퍼즐을 섞고, 임의의 한 블록을 텅 비게 만듬.
         public void Swap()
         {
             Image[] images = start.GetComponentsInChildren<Image>();
@@ -57,6 +60,7 @@ public class GalleryScene : Stage, IDisableButton, IClickDelay
             images[empty].sprite = null;
             Destroy(Empty.GetComponent<Button>());
         }
+        //현재 상태가 정답인지 체크
         public bool Check
         {
             get
@@ -101,6 +105,7 @@ public class GalleryScene : Stage, IDisableButton, IClickDelay
             List<RectTransform> height = new List<RectTransform>();
             float step = 1000 / info.PuzzleNumber;
             Vector2 pos = puzzle.complete.transform.position;
+            puzzle.complete.GetComponent<AudioSource>().Play();
             //완성 이미지의 불투명하게 한다.
             while (color.a < 1)
             {
@@ -146,17 +151,20 @@ public class GalleryScene : Stage, IDisableButton, IClickDelay
         }
     }
     public event VoidDelegate ClearEvent;
-    public event VoidDelegate FailEvent;
+    public event VoidDelegate FailEvent; //타이머형 이벤트에 버튼을 쓰지않으므로 FailEvent는 미사용.
     public Gallery info;
     [SerializeField]
     GalleryPuzzle puzzle;
+    AudioSource au;
     public void Click(Transform block)
     {
         if (!clickenable) return;
-        int empty = puzzle.Empty.GetSiblingIndex();
-        int index = block.GetSiblingIndex();
-        bool enable1 = (block.position.y == puzzle.Empty.position.y) && (index + 1 == empty || index - 1 == empty);
-        bool enable2 = (block.position.x == puzzle.Empty.position.x) && (index + info.PuzzleNumber == empty || index - info.PuzzleNumber == empty);
+        if (au == null) au = GetComponent<AudioSource>();//오디오 출력기를 아직 얻지않은경우 얻어옴.
+        int empty = puzzle.Empty.GetSiblingIndex();//빈 블록의 번짓수를 받음.
+        int index = block.GetSiblingIndex();//선택한 블록의 번짓수를 받음.
+        bool enable1 = (block.position.y == puzzle.Empty.position.y) && (index + 1 == empty || index - 1 == empty);//선택한 블록과 빈 블록의 열 위치가 같고, 두 블록이 좌우로 붙어있는경우
+        bool enable2 = (block.position.x == puzzle.Empty.position.x) && (index + info.PuzzleNumber == empty || index - info.PuzzleNumber == empty);//선택한 블록과 빈 블록의 행 위치가 같고, 두 블록이 세로로 붙어있는 경우
+        //퍼즐을 움직일수 잇는경우
         if (enable1 || enable2)
         {
             clickenable = false;
@@ -165,19 +173,21 @@ public class GalleryScene : Stage, IDisableButton, IClickDelay
     }
     IEnumerator BlockMove(Transform target)//블록 움직임 효과
     {
+        au.Play();
         Transform afterempty = Instantiate(puzzle.Empty, puzzle.Empty, false).transform;
         afterempty.position = target.position;
+        //현재 블록과 빈 블록의 방향을 파악.
         Vector3 dir = (puzzle.Empty.position - target.position).normalized;
         int beforeindex = target.GetSiblingIndex();
         target.SetParent(puzzle.Empty);
         while (true)
         {
             target.position += puzzle.speed * dir;
-            Vector3 afterdir = (puzzle.Empty.position - target.position).normalized;
-            if (target.position == puzzle.Empty.position) break;
-            else if (!dir.Equals(afterdir))
+            Vector3 afterdir = (puzzle.Empty.position - target.position).normalized;//매 호출마다 방향 파악
+            if (target.position == puzzle.Empty.position) break;//목적지에 도달시 중단.
+            else if (!dir.Equals(afterdir)) //방향이 바뀐경우(목적지를 지나친경우)
             {
-                target.position = puzzle.Empty.position;
+                target.position = puzzle.Empty.position;//목적지 고정
                 break;
             }
             yield return new WaitForEndOfFrame();
@@ -189,7 +199,7 @@ public class GalleryScene : Stage, IDisableButton, IClickDelay
         target.SetSiblingIndex(index);
         DestroyImmediate(puzzle.Empty.gameObject);
         puzzle.Empty = afterempty;
-        if (puzzle.Check) ClearEvent();
+        if (puzzle.Check) ClearEvent(); //정답인경우 클리어 이벤트 출력.
         clickenable = true;
     }
 }

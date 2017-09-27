@@ -21,7 +21,10 @@ public class MessageScene : Stage,IBeforeClear,IClickDelay,INormalButton
     public MessageBlockSpace blockspace;
     public MessageBubbleSpace bubblespace;
     [SerializeField]
-    Message.MessageInfo[] info = new Message.MessageInfo[0];
+    AudioClip createsound;
+    [SerializeField]
+    AudioClip spacefadeout;
+    public AudioClip kwang;
     string[] answers;
     public Image background;
     protected override Action BeforeIntro
@@ -30,6 +33,7 @@ public class MessageScene : Stage,IBeforeClear,IClickDelay,INormalButton
         {
             return () =>
             {
+                Message.MessageInfo[] info = SmartPhone.GetData<Message>().items;
                 background = bubblespace.transform.parent.GetComponent<Image>();
                 blockspace.scene = this;
                 bubblespace.scene = this;
@@ -48,8 +52,10 @@ public class MessageScene : Stage,IBeforeClear,IClickDelay,INormalButton
             foreach(var block in blockspace.items)
             {
                 block.gameObject.SetActive(true);
+                block.GetComponent<AudioSource>().PlayOneShot(createsound);
                 iTween.ShakeScale(block.gameObject, new Vector2(5, 5), 2f);
                 yield return new WaitForSeconds(0.5f);
+                block.GetComponent<AudioSource>().PlayOneShot(kwang);
             }
             clickenable = true;
         }
@@ -79,6 +85,7 @@ public class MessageScene : Stage,IBeforeClear,IClickDelay,INormalButton
     {
         get
         {
+            BackgroundMusic.PlayOneShot(spacefadeout);
             while(true)
             {
                 if(blockspace.transform.localScale.x>0) SmartPhone.SizeSet(blockspace, -Time.deltaTime, 0);
@@ -86,7 +93,6 @@ public class MessageScene : Stage,IBeforeClear,IClickDelay,INormalButton
                 if (blockspace.transform.localScale.x == 0 && bubblespace.transform.localScale.x == 0) break;
                 else yield return new WaitForEndOfFrame();
             }
-            SmartPhone.memory.Message = StageMemory.Status.PerfectClear;
         }
     }
 }

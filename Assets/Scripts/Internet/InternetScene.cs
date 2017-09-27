@@ -42,19 +42,24 @@ public class InternetScene : Stage,INormalButton,IBeforeClear
             return block.Header;
         }
     }
+    //BeforeClear에서 각 항목을 날려버리기위한 구조체.
     [Serializable]
     private struct RollingBlock
     {
         public Transform block;
         public Transform parent;
+        public AudioClip sound;
         public int dir;
+        //y_val= 위로 튕겨져나가는 속도
         public IEnumerator RollingThrow(params float[] y_val)
         {
+            block.GetComponent<AudioSource>().PlayOneShot(sound);
             float y_dir = 10;
-            if (y_val.Length > 0) y_dir += y_val[0];
+            if (y_val.Length > 0) y_dir += y_val[0]; 
             float cnt = 0;
-            float rot_dir = dir == 0 ? 1 : dir;
+            float rot_dir = dir == 0 ? 1 : dir;  //방향이 정의된경우 해당 방향으로, 정의되지않은경우 임의로 돌린다.
             block.SetParent(parent);
+            //x증가값은 한 방향으로 증가시키고, y증가값은 점차 감소시킴으로써, 포물선 효과를 발생시킨다.
             while(cnt<10)
             {
                 Vector3 pos = block.position;
@@ -64,7 +69,7 @@ public class InternetScene : Stage,INormalButton,IBeforeClear
                 block.position = pos;
                 pos = block.rotation.eulerAngles;
                 pos.z += rot_dir * 30;
-                block.rotation = Quaternion.Euler(pos);
+                block.rotation = Quaternion.Euler(pos); //객체를 회전시킨다.
                 cnt += Time.deltaTime;
                 yield return new WaitForEndOfFrame();
             }
@@ -84,6 +89,8 @@ public class InternetScene : Stage,INormalButton,IBeforeClear
     RectTransform Relation;
     [SerializeField]
     InputField AnswerField;
+    [SerializeField]
+    AudioClip rollingblockeffect;
     float SiteSetting(RectTransform block,Internet.SiteInfo site)
     {
         Text[] content = block.GetComponentsInChildren<Text>();
@@ -173,6 +180,7 @@ public class InternetScene : Stage,INormalButton,IBeforeClear
             if (site.Enable) blocks.Add(site);
             if (knowin.Enable) blocks.Add(knowin);
             if (wiki.Enable) blocks.Add(wiki);
+            //각 항목을 화면밖에서 안으로 당긴다.
             foreach (RectTransform item in blocks)
             {
                 Vector2 pivot = new Vector2(0.5f, 0.5f);
@@ -198,10 +206,9 @@ public class InternetScene : Stage,INormalButton,IBeforeClear
                     item.localScale = size;
                     yield return new WaitForEndOfFrame();
                 }
+                item.GetComponent<AudioSource>().Play();
             }
             AnswerField.interactable = true;
-            AnswerField.text = answers[0];
-
         }
     }
     public override MissionType missontype { get { return MissionType.Count; } }
@@ -209,7 +216,6 @@ public class InternetScene : Stage,INormalButton,IBeforeClear
     public bool Answer { get { string text = AnswerField.text; foreach (string answer in answers) if (text == answer) return true; return false; } }
     public override int WestedLifeClear { get { return 3; } }
     public override int WestedLifeGameOver { get { return 5; } }
-
     public IEnumerator BeforeClear
     {
         get
@@ -224,6 +230,7 @@ public class InternetScene : Stage,INormalButton,IBeforeClear
             int dir = -1;
             while(blocks.Count>0)
             {
+                //맨 위 항목이 아직 튕겨져나가기 충분한 높이에 이르지 못한경우
                 if(blocks[0].position.y<1300)
                 {
                     foreach(var block in blocks)
@@ -234,21 +241,25 @@ public class InternetScene : Stage,INormalButton,IBeforeClear
                     }
                     yield return new WaitForEndOfFrame();
                 }
+                //맨 위 항목이 튕겨져나가기 충분한 높이에 이른경우
                 else
                 {
                     RollingBlock rolling = new RollingBlock();
                     rolling.block = blocks[0];
-                    rolling.dir = dir;
+                    rolling.dir = dir; 
                     rolling.parent = this.transform;
-                    dir *= -1;
-                    blocks.RemoveAt(0);
-                    StartCoroutine(rolling.RollingThrow());
+                    rolling.sound = rollingblockeffect;
+                    dir *= -1; //이전 블록과 반대 방향으로 가게끔 방향조정.
+                    blocks.RemoveAt(0);//맨위 블록을 리스트에서 제거.
+                    StartCoroutine(rolling.RollingThrow()); //담은 항목을 던진다.
                 }
             }
+            //스크롤 창을 담아서 던진다.
             RollingBlock rolling2 = new RollingBlock();
             rolling2.block = scroll;
             rolling2.dir = 0;
             rolling2.parent = this.transform;
+            rolling2.sound = rollingblockeffect;
             StartCoroutine(rolling2.RollingThrow(20f));
             yield return new WaitForSeconds(1.5f);
         }

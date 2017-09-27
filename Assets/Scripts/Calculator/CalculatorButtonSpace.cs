@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
+//계산기 버튼 12개를 관리한다.
 public class CalculatorButtonSpace : MonoBehaviour
 {
     [HideInInspector]
@@ -23,8 +24,10 @@ public class CalculatorButtonSpace : MonoBehaviour
     {
         scene.NowValue = scene.NowValue.Remove(scene.NowValue.Length - 1);
     }
+    //Stage의 AfterIntro에 대응. 
     public IEnumerator ButtonPrepare()
     {
+        //각 버튼에 클릭 메소드 부여후 활성화 효과
         for (int i = 0; i < 12; i++)
         {
             buttons[i].interactable = true;
@@ -49,6 +52,7 @@ public class CalculatorButtonSpace : MonoBehaviour
     }
     public IEnumerator ButtonUnPreapre()
     {
+        //임의의 버튼을 비활성화시킴.
         while (buttons.Count > 0)
         {
             if (buttons.Count > 0)
@@ -61,6 +65,7 @@ public class CalculatorButtonSpace : MonoBehaviour
         }
         Vector2 scale = this.transform.localScale;
         float spd = Time.deltaTime;
+        //버튼 영역 전체를 화면안쪽으로 밀음.
         while(this.transform.localScale.x>0.01f)
         {
             SmartPhone.SizeSet(this.transform, -spd, 0.01f);

@@ -8,7 +8,9 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 public class LifeSystem : MonoBehaviour
 {
+    //LifeSystem의 각 부분별 속성을 명확히 하기위해 구조체 분할.
 #region 파생 구조체 
+        //라이프창이 표시되는 틀
     [Serializable]
     public struct LifeInterface
     {
@@ -20,11 +22,13 @@ public class LifeSystem : MonoBehaviour
         RectTransform lifevalue;
         RawImage face;
         Text notice;
+        AudioSource au;
         public Image Frame;
         public Button submit;
         public Vector2 Value { get { return lifevalue.sizeDelta; }  set { lifevalue.sizeDelta = value; } }
         public Vector2 FaceFieldSize { get { return FaceField.sizeDelta; } set { FaceField.sizeDelta = value; } }
         public Texture Face { get { return face.texture; } set { face.texture = value; } }
+        public AudioSource Au { get { if (au == null) au = Frame.GetComponent<AudioSource>(); return au; } }
         public float Intro_Goal { get { return NoticeField.transform.position.y; } }
         public string Notice { get { return notice.text; } set { notice.text = value; } }
         public void Init()
@@ -42,6 +46,7 @@ public class LifeSystem : MonoBehaviour
             lifevalue.SetParent(enable == true ? Frame.transform : ValueField);
         }
     }
+    //처음 진입문구, 클리어 문구가 표시되는 장소
     [Serializable]
     public struct NoticeInterface
     {
@@ -72,6 +77,7 @@ public class LifeSystem : MonoBehaviour
         public Color ClearColor { get { return clear.color; } set{ clear.color = value;} }
         
     }
+    //각종 이벤트 진행 속도
     [Serializable]
     public struct SpeedControl
     {
@@ -97,7 +103,7 @@ public class LifeSystem : MonoBehaviour
         public float Clear { get { return clear; } }
     }
 
-    public LifeInterface lifeUI;
+    public LifeInterface lifeUI; // 버튼을 관리하므로 예외적으로 LifeInterface만 Stage가 접근할수있게끔한다.
     [SerializeField]
     SpeedControl speed;
     [SerializeField]
@@ -105,6 +111,12 @@ public class LifeSystem : MonoBehaviour
     #endregion
     [HideInInspector]
     public Stage stage;
+    [SerializeField]
+    AudioClip fail;
+    [SerializeField]
+    AudioClip clear;
+    [SerializeField]
+    AudioClip gameover;
     int life;
     string Misson
     {
@@ -196,7 +208,7 @@ public class LifeSystem : MonoBehaviour
             pos = lifeUI.FaceFieldSize;
             while (pos.x < 145)
             {
-                pos.x += 5;
+                pos.x += 10;
                 if (pos.x > 145) pos.x = 145;
                 lifeUI.FaceFieldSize = pos;
                 yield return new WaitForEndOfFrame();
@@ -209,14 +221,18 @@ public class LifeSystem : MonoBehaviour
         {
             CancelInvoke();
             if (lifeUI.submit != null) lifeUI.submit.interactable = false;
+            stage.BackgroundMusic.Stop();
+            lifeUI.Au.PlayOneShot(clear);
+            SaveDataSet();
             Color color = notice.ClearColor;
-            color.a = 0.2f;
+            color.a = 0.2f; //클리어 문구를 투명하게끔한다.
             notice.ClearColor = color;
             Vector2 pos = notice.Clear;
             Vector2 rightpos = pos;
             rightpos.x *= -1;
-            int loc = 100;
+            int loc = 100; //중앙에서 약간 더 나아가게끔 목적지 지정.
             float spd = speed.Clear;
+            //양 옆에서 클리어문구가 중앙으로 밀려오게 한다.
             while (pos.x < loc)
             {
                 pos.x += spd;
@@ -231,8 +247,9 @@ public class LifeSystem : MonoBehaviour
                 notice.RightClear = rightpos;
                 yield return new WaitForEndOfFrame();
             }
-            loc = 0;
-            spd = speed.Clear * 0.1f;
+            loc = 0; //중앙으로 목적지 지정.
+            spd = speed.Clear * 0.1f; //스피드를 초기화하고, 기존값보다 약간 더 줄인다.
+            //두 클리어 문구를 중앙에 맞춘다.
             while (pos.x > loc)
             {
                 pos.x -= spd;
@@ -247,14 +264,18 @@ public class LifeSystem : MonoBehaviour
                 notice.RightClear = rightpos;
                 yield return new WaitForEndOfFrame();
             }
+            //클리어 문구를 불투명하게 바꾼다.
             color.a = 1;
             notice.ClearColor = color;
+            yield return new WaitForSeconds(3f);
         }
     }
+    //NormalClear를 역순으로 진행.
     public IEnumerator SectorClear
     {
         get
         {
+            yield return new WaitForSeconds(1f);
             Color color = notice.ClearColor;
             Vector2 pos = notice.Clear;
             Vector2 rightpos = notice.RightClear;
@@ -297,18 +318,22 @@ public class LifeSystem : MonoBehaviour
     public IEnumerator FailEvent
     {
         get {
-            life -= stage.WestedLifeFail;
-            lifeUI.Value = new Vector2(step * life, 120);
-            lifeUI.Notice = stage.missontype == MissionType.Count ? NowLife : NowTime;
-            iTween.ShakePosition(lifeUI.Frame.gameObject, new Vector2(20, 20), 1f);
+            lifeUI.Au.PlayOneShot(fail);
+            life -= stage.WestedLifeFail; //Stage 하위클래스가 구현한 감소라이프값만큼 현재 라이프값 감소. 
+            lifeUI.Value = new Vector2(step * life, 120);//수치 표현
+            lifeUI.Notice = stage.missontype == MissionType.Count ? NowLife : NowTime; //MissionType에 따라 문구 갱신.
+            iTween.ShakePosition(lifeUI.Frame.gameObject, new Vector2(20, 20), 1f);//LifeInterface가 흔들리게끔 함.
+            //LifeInterface가 점등되게끔 함.
             for (int i = 0; i < 10; i++)
             {
                 lifeUI.Frame.color = lifeUI.Frame.color == Color.red ? Color.white : Color.red;
                 yield return new WaitForSeconds(0.1f);
             }
+            //라이프가 0이 된경우 GameOver 재생.
             if (life == 0) yield return StartCoroutine(GameOver);
         }
     }
+    //MissionType에 따라 문구를 표시하고, Timer인경우 타이머 작동. Stage 하위 클래스가 IClickDelay를 가진경우 clickenable을 수정.
     public Action GameStart
     {
         get
@@ -334,11 +359,13 @@ public class LifeSystem : MonoBehaviour
     {
         get
         {
-            if (lifeUI.submit != null) lifeUI.submit.interactable = false;
+            stage.BackgroundMusic.Stop();
+            if (lifeUI.submit != null) lifeUI.submit.interactable = false; //버튼이 존재하는경우 버튼을 강제로 비활성화
+            lifeUI.Au.PlayOneShot(gameover);
             Transform[] trs = this.transform.root.GetComponentsInChildren<Transform>();
-            foreach (var tr in trs) iTween.ShakePosition(tr.gameObject, new Vector3(100, 100, 0), 2f);
-            yield return new WaitForSeconds(1.5f);
-            SmartPhone.LoadStage("StageSelect");
+            foreach (var tr in trs) iTween.ShakePosition(tr.gameObject, new Vector3(100, 100, 0), 2f);//모든 씬 내 객체를 뒤흔듬
+            yield return new WaitForSeconds(3f);
+            SmartPhone.LoadStage("StageSelect");//메인 스테이지로
         }
     }
     void Timer()
@@ -348,5 +375,28 @@ public class LifeSystem : MonoBehaviour
         lifeUI.Notice = NowTime;
         if (life > 0) Invoke("Timer", 1f);
         else StartCoroutine(GameOver);
+    }
+    // 한번의 클리어 이벤트만을 실행하는 어플의 경우, 여기서 클리어 상태를 체크. 섹터 클리어나 LifeSystem을 사용하지않는 씬은 해당 씬에서 직접 처리.
+    void SaveDataSet()
+    {
+        string name = SceneManager.GetActiveScene().name;
+        switch (name)
+        {
+            case "Message":
+                SmartPhone.memory.Message = StageMemory.Status.PerfectClear;
+                break;
+            case "Internet":
+                SmartPhone.memory.Internet= StageMemory.Status.PerfectClear;
+                break;
+            case "Dictionary":
+                SmartPhone.memory.Dictionary = StageMemory.Status.PerfectClear;
+                break;
+            case "Calculator":
+                SmartPhone.memory.Calculator = StageMemory.Status.PerfectClear;
+                break;
+            case "Gallery":
+                SmartPhone.memory.Gallery = StageMemory.Status.PerfectClear;
+                break;
+        }
     }
 }
